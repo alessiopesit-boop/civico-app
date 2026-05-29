@@ -1,59 +1,41 @@
-# CivicoApp
+# Civico
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.13.
+Webapp civica mobile-first per segnalazioni urbane: i cittadini segnalano disservizi (buche, lampioni, alberi, rifiuti) e fatti di sicurezza (furti, vandalismi) della propria zona, e si confermano a vicenda le segnalazioni. Dalla gente, per la gente: non dipende dal Comune.
 
-## Development server
+Sito: https://alessiopesit-boop.github.io/civico-app/
 
-To start a local development server, run:
+> Stato: prototipo navigabile, 100% locale (nessun backend). Auth simulata, dati e preferenze in `localStorage`.
 
-```bash
-ng serve
-```
+## Cosa c'e'
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Onboarding + login a tre livelli (ospite in sola lettura, base, attivo con OTP)
+- Home con mappa e bottom sheet trascinabile, filtri e ordinamento del feed
+- Dettaglio segnalazione con conferme, risoluzione collaborativa, timeline, "segui", flag
+- Nuova segnalazione in 3 step (foto, posizione sulla mappa, descrizione), con anonimato per la sicurezza
+- Mappa fullscreen, profilo, notifiche, impostazioni, info & policy, storico
+- Gestione multi-zona con verifica GPS (simulata)
+- PWA installabile
 
-## Code scaffolding
+## Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Angular 21 (standalone, zoneless, signals), SCSS, Google Maps (con fallback a mappa SVG quando non c'e' la API key). Build con `@angular/build` (esbuild + vite).
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Sviluppo
 
 ```bash
-ng build
+npm install
+npm start          # http://localhost:4200
+npm run build      # build di produzione in dist/civico-app/browser/
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+In locale la mappa usa il fallback SVG: nessuna API key necessaria.
 
-## Running unit tests
+### Google Maps (opzionale in locale)
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Per la mappa reale, metti una API key della Google Maps JavaScript API in `src/environments/environment.ts` (e/o `environment.development.ts`). Restringi la key per HTTP referrer a `localhost:4200/*` e `alessiopesit-boop.github.io/*`. Senza key, l'app resta pienamente navigabile con la mappa stilizzata.
 
-```bash
-ng test
-```
+## Deploy
 
-## Running end-to-end tests
+Pubblicazione automatica su GitHub Pages a ogni Release. Il versioning e le release sono gestiti da [release-please](https://github.com/googleapis/release-please): si mergiano PR con [Conventional Commits](https://www.conventionalcommits.org/), il bot apre la Release PR, e al merge nascono tag, GitHub Release e deploy.
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Dettagli di sviluppo, convenzioni e flusso di lavoro completo: vedi [`CLAUDE.md`](./CLAUDE.md).

@@ -1,0 +1,67 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Storico</div>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="head">
+    <h1>Memoria della zona</h1>
+    <p>Trastevere — ultimi 3 mesi</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="num">{{ history.length }}</div>
+      <div class="lab">Archiviate</div>
+      <div class="sub">totali</div>
+    </div>
+    <div class="stat">
+      <div class="num green">{{ resolved() }}</div>
+      <div class="lab">Risolte</div>
+      <div class="sub">dalla community</div>
+    </div>
+    <div class="stat">
+      <div class="num mute">{{ expired() }}</div>
+      <div class="lab">Scadute</div>
+      <div class="sub">senza reazioni</div>
+    </div>
+  </div>
+
+  <div class="info-note">
+    <cv-icon name="info" [size]="14" color="var(--cv-amber)"/>
+    <span>Lo storico completo arriverà col tempo. Per ora vedi le segnalazioni archiviate degli ultimi 3 mesi.</span>
+  </div>
+
+  <div class="list">
+    <div class="eyebrow">Archivio</div>
+    @for (r of history; track r.id) {
+      <div class="row">
+        <cv-photo [kind]="r.photo" [w]="48" [h]="48" [radius]="9"/>
+        <div class="meta">
+          <div class="cat" [style.color]="CATS[r.cat].color">
+            <cv-icon [name]="CATS[r.cat].iconName" [size]="11" [color]="CATS[r.cat].color"/>
+            {{ CATS[r.cat].label }}
+            <span class="when">· {{ r.archivedAt }}</span>
+          </div>
+          <div class="title">{{ r.title }}</div>
+          <div class="where">
+            <cv-icon name="pinSmall" [size]="10" color="var(--cv-text-faint)"/>
+            {{ r.where }}
+          </div>
+        </div>
+        <div class="right">
+          <div class="outcome" [class.resolved]="r.outcome === 'risolta'">
+            {{ r.outcome === 'risolta' ? '✓ RISOLTA' : 'SCADUTA' }}
+          </div>
+          <div class="confirms">{{ r.confirms }} conferme</div>
+        </div>
+      </div>
+    }
+    <div class="show-more">
+      <button>Mostra più vecchi</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <span class="spacer"></span>
+    <cv-icon-btn (btnClick)="goSettings()">
+      <cv-icon name="settings" [size]="16" color="var(--cv-text)"/>
+    </cv-icon-btn>
+  </header>
+
+  <div class="title-wrap">
+    <h1>Attività</h1>
+    <p>3 nuove · ultimi 7 giorni</p>
+  </div>
+
+  <div class="tabs">
+    @for (t of tabs; track t.k) {
+      <button class="tab" [class.on]="tab() === t.k" (click)="setTab(t.k)">
+        {{ t.label }}
+        <span class="count">{{ t.count }}</span>
+        @if (tab() === t.k) { <span class="underline"></span> }
+      </button>
+    }
+  </div>
+
+  <div class="list">
+    <div class="eyebrow">Oggi</div>
+    @for (row of oggi; track row.text) {
+      <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
+        @if (row.unread) { <span class="unread-dot"></span> }
+        <div class="row-icon" [style.background]="row.bg">
+          <cv-icon [name]="$any(row.iconName)" [size]="16" [color]="row.iconColor"/>
+        </div>
+        <div class="row-text">
+          <div class="row-title">
+            @if (row.prefix) { <b>{{ row.prefix }}</b> }
+            {{ row.text }}
+          </div>
+          <div class="row-sub">{{ row.sub }}</div>
+          <div class="row-meta">
+            <span class="time">{{ row.time }}</span>
+            @if (row.action) { <span class="action">{{ row.action }}</span> }
+          </div>
+        </div>
+      </button>
+    }
+
+    <div class="eyebrow">Questa settimana</div>
+    @for (row of settimana; track row.text) {
+      <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
+        @if (row.unread) { <span class="unread-dot"></span> }
+        <div class="row-icon" [style.background]="row.bg">
+          <cv-icon [name]="$any(row.iconName)" [size]="16" [color]="row.iconColor"/>
+        </div>
+        <div class="row-text">
+          <div class="row-title">
+            @if (row.prefix) { <b>{{ row.prefix }}</b> }
+            {{ row.text }}
+          </div>
+          <div class="row-sub">{{ row.sub }}</div>
+          <div class="row-meta">
+            <span class="time">{{ row.time }}</span>
+            @if (row.action) { <span class="action">{{ row.action }}</span> }
+          </div>
+        </div>
+      </button>
+    }
+  </div>
+</div>

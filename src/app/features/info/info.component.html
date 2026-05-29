@@ -1,0 +1,43 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Info & policy</div>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="tabs">
+    @for (t of tabs; track t.k) {
+      <button class="tab" [class.on]="tab() === t.k" (click)="setTab(t.k)">
+        {{ t.label }}
+        @if (tab() === t.k) { <span class="underline"></span> }
+      </button>
+    }
+  </div>
+
+  <div class="content">
+    @for (it of items(); track it.title) {
+      @if (it.type === 'section') {
+        <section class="sect">
+          <h2>{{ it.title }}</h2>
+          <p>{{ it.body }}</p>
+        </section>
+      } @else {
+        <div class="callout" [class.warn]="it.kind === 'warn'" [class.note]="it.kind === 'note'" [class.ok]="it.kind === 'ok'">
+          <div class="cl-icon">{{ it.kind === 'warn' ? '!' : 'i' }}</div>
+          <div class="cl-text">
+            <div class="cl-title">{{ it.title }}</div>
+            <div class="cl-body">{{ it.body }}</div>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="contacts">
+      <div class="c-title">Contatti</div>
+      <div class="c-body">ciao&#64;civico.app · Per Comuni: comuni&#64;civico.app</div>
+    </div>
+    <div class="version">Civico v0.1 · fatto dai cittadini.</div>
+  </div>
+</div>

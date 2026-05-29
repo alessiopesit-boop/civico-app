@@ -1,0 +1,57 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Verifica numero</div>
+    <button type="button" class="skip" (click)="skip()">Salta</button>
+  </header>
+
+  <div class="body">
+    <div class="icon-bubble">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="6" y="3" width="12" height="18" rx="2.5" stroke="var(--cv-amber)" stroke-width="1.7"/>
+        <path d="M10 18h4" stroke="var(--cv-amber)" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    @if (step() === 'enter') {
+      <h1 class="hl">Diventa account <span class="amber">attivo</span></h1>
+      <p class="sub">Il cellulare verifica che sei una persona vera. Ti permette di <b>segnalare e confermare</b>, senza vedi solo.</p>
+
+      <div class="row">
+        <div class="prefix">🇮🇹 +39</div>
+        <input class="field" type="tel" inputmode="numeric"
+               placeholder="333 1234567"
+               [ngModel]="phone()" (ngModelChange)="onPhoneInput($event)" name="phone"/>
+      </div>
+
+      <div class="benefits">
+        @for (b of benefits; track b) {
+          <div class="benefit">
+            <span class="tick">✓</span>
+            <span>{{ b }}</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <h1 class="hl">Inserisci il codice</h1>
+      <p class="sub">Codice inviato a <b>+39 {{ phone() }}</b>.</p>
+
+      <input class="otp" inputmode="numeric" maxlength="6" placeholder="••••••"
+             [ngModel]="otp()" (ngModelChange)="onOtpInput($event)" name="otp"/>
+    }
+  </div>
+
+  <div class="actions">
+    @if (step() === 'enter') {
+      <button type="button" class="cta" [class.is-enabled]="canSendCode()" [disabled]="!canSendCode()" (click)="sendCode()">
+        Invia codice
+      </button>
+    } @else {
+      <button type="button" class="cta" [class.is-enabled]="canConfirm()" [disabled]="!canConfirm()" (click)="confirm()">
+        Conferma e attiva
+      </button>
+    }
+  </div>
+</div>

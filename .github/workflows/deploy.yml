@@ -1,0 +1,72 @@
+name: Deploy to GitHub Pages
+
+# Trigger: solo quando viene pubblicata una GitHub Release (cioe' quando
+# release-please mergia la Release PR, crea il tag e pubblica la Release).
+# I push diretti su main NON pubblicano: cosi' il sito live e' sempre
+# allineato all'ultimo tag.
+# workflow_dispatch e' lasciato attivo come fuga di sicurezza per pubblicare
+# manualmente l'ultimo main (demo, screenshot) senza creare una release.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Una sola pubblicazione in corso alla volta; le successive accodano e
+# possono cancellare quella in volo se serve.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular (production)
+        # `npm run build` (e non `npx ng build`) per attivare lo step
+        # `prebuild` che genera src/app/core/build-sha.local.ts. Il repo
+        # e' un project Pages: il sito vive su
+        # https://alessiopesit-boop.github.io/civico-app/, quindi il base
+        # href dei bundle deve essere /civico-app/.
+        run: npm run build -- --configuration=production --base-href=/civico-app/
+
+      - name: Prepara cartella per Pages
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          cp -a dist/civico-app/browser/. _site/
+          # .nojekyll evita che Pages processi file con prefisso _
+          touch _site/.nojekyll
+          ls -la _site
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

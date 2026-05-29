@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Auto-generato a ogni npm install / start / build da scripts/write-build-sha.mjs
+src/app/core/build-sha.local.ts
+
 # System files
 .DS_Store
 Thumbs.db

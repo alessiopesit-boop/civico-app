@@ -1,0 +1,69 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Le mie zone</div>
+    <cv-icon-btn (btnClick)="add()">
+      <cv-icon name="plus" [size]="14" color="var(--cv-text)"/>
+    </cv-icon-btn>
+  </header>
+
+  <div class="list">
+    @for (z of data.zones(); track z.id) {
+      <div class="zone">
+        <div class="z-head">
+          <div class="z-dot" [class.active]="isActive(z)">
+            <cv-icon name="pinSmall" [size]="15" [color]="isActive(z) ? 'var(--cv-bg)' : 'var(--cv-text-mute)'"/>
+          </div>
+          <div class="z-meta">
+            <div class="z-name">
+              <span>{{ z.name }}</span>
+              <span class="z-city">· {{ z.city }}</span>
+              @if (isActive(z)) { <span class="z-active">ATTIVA</span> }
+            </div>
+            <div class="z-status">
+              @if (z.verified) {
+                <span class="ok">
+                  <cv-icon name="check" [size]="10" color="var(--cv-green)"/> verificata
+                </span>
+              } @else {
+                <span class="warn">
+                  <cv-icon name="lock" [size]="10" color="var(--cv-amber)"/> da verificare
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="z-roles">
+          @for (r of roles; track r.k) {
+            <button class="z-role" [class.on]="z.role === r.k" (click)="setRole(z, r.k)">
+              {{ r.label }}
+            </button>
+          }
+        </div>
+
+        <div class="z-actions">
+          @if (!z.verified) {
+            <button class="z-verify" (click)="verify(z)">
+              <cv-icon name="locate" [size]="12" color="var(--cv-amber)"/>
+              Verifica
+            </button>
+          }
+          @if (!isActive(z)) {
+            <button class="z-make-active" (click)="makeActive(z)">Rendi attiva</button>
+          }
+          @if (data.zones().length > 1) {
+            <button class="z-remove" (click)="remove(z)">Rimuovi</button>
+          }
+        </div>
+      </div>
+    }
+
+    <button class="add-zone" (click)="add()">
+      <cv-icon name="plus" [size]="14" color="var(--cv-text)"/>
+      Aggiungi una zona
+    </button>
+  </div>
+</div>

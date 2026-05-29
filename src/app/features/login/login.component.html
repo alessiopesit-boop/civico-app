@@ -1,0 +1,63 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <cv-wordmark [size]="16"/>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="body">
+    @if (mode() === 'options') {
+      <h1 class="headline">Entra in Civico</h1>
+      <p class="sub">Crea un account base con Google o email, poi verifica il numero per partecipare attivamente.</p>
+
+      <div class="options">
+        <button type="button" class="opt google" (click)="goBase('Google')">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.4-.2-2H12v3.9h5.9c-.1.9-.8 2.4-2.3 3.4l-.0 .1 3.4 2.6.2 0c2.1-2 3.3-4.9 3.3-8z"/>
+            <path fill="#34A853" d="M12 23c3 0 5.6-1 7.4-2.7l-3.5-2.7c-1 .7-2.2 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7l-.1 0-3.6 2.8 0 .1C3.7 20.4 7.5 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.6 14c-.2-.7-.4-1.4-.4-2.2 0-.8.1-1.5.4-2.2L5.5 9.5 1.9 6.7l-.1 .1C1 8.4.5 10.1.5 12s.5 3.6 1.3 5.2l3.8-3z"/>
+            <path fill="#EA4335" d="M12 5.4c2.1 0 3.6.9 4.4 1.7l3.2-3.1C17.6 2.3 15 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.8 2.9C6.5 7.4 9 5.4 12 5.4z"/>
+          </svg>
+          Continua con Google
+        </button>
+
+        <button type="button" class="opt email" (click)="mode.set('email')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+          Continua con email
+        </button>
+      </div>
+
+      <div class="divider"><span>o</span></div>
+
+      <button type="button" class="guest" (click)="goGuest()">Esplora come ospite</button>
+      <p class="guest-note">Solo lettura della mappa pubblica. Per segnalare o confermare serve account attivo.</p>
+
+      <p class="legal">
+        Continuando accetti i
+        <a routerLink="/info" [queryParams]="{ tab: 'termini' }">Termini</a> e la
+        <a routerLink="/info" [queryParams]="{ tab: 'privacy' }">Privacy</a>.
+      </p>
+    } @else {
+      <h1 class="headline sm">Accedi con email</h1>
+      <p class="sub">Useremo un OTP via email per confermare il tuo accesso.</p>
+
+      <form class="form" (ngSubmit)="goBase('via email')">
+        <input class="field" type="email" placeholder="nome@esempio.it"
+               [ngModel]="email()" (ngModelChange)="email.set($event)" name="email" autocomplete="email"/>
+        <input class="field" type="password" placeholder="Password"
+               [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" autocomplete="current-password"/>
+        <button type="submit" class="cta" [class.is-enabled]="canSubmitEmail()" [disabled]="!canSubmitEmail()">Accedi</button>
+      </form>
+
+      <div class="forgot">
+        <a (click)="forgotPassword()">Password dimenticata?</a>
+      </div>
+      <p class="signup">Non hai un account? <a (click)="goBase('via email')">Crea account</a></p>
+    }
+  </div>
+</div>

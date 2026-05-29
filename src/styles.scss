@@ -1,1 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
+@use './styles/tokens';
+@use './styles/animations';
+@use './styles/mixins' as *;
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--cv-bg-page);
+  font-family: var(--cv-font);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  overscroll-behavior: none;
+  color-scheme: dark;
+  color: var(--cv-text);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+// Hide scrollbars across the app
+.cv-app {
+  @include no-scrollbar;
+
+  * {
+    @include no-scrollbar;
+  }
+}
