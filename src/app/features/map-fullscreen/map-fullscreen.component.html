@@ -1,0 +1,81 @@
+<div class="screen">
+  <div class="map-wrap">
+    @if (useGoogleMap()) {
+      <cv-google-map [pins]="data.pins()" [dimmedIds]="dimmedIds()" (pinClick)="openDetail($event)"/>
+    } @else {
+      <cv-map-background [height]="1000"/>
+      @for (p of data.pins(); track p.id) {
+        <cv-map-pin [pin]="p" [dim]="dimmedIds().has(p.id)" [big]="p.id === 1" (pinClick)="openDetail(p)"/>
+      }
+      <div class="cluster">+7</div>
+      <div class="you"></div>
+    }
+  </div>
+
+  <div class="top">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="search">
+      <cv-icon name="search" [size]="15" color="var(--cv-text-mute)"/>
+      <span>Cerca indirizzo o zona</span>
+      <div class="sep"></div>
+      <cv-icon name="filter" [size]="15" color="var(--cv-text)"/>
+    </div>
+  </div>
+
+  <div class="rail">
+    <cv-icon-btn><cv-icon name="layers" [size]="15" color="var(--cv-text)"/></cv-icon-btn>
+    <cv-icon-btn><cv-icon name="locate" [size]="15" color="var(--cv-text)"/></cv-icon-btn>
+    <div class="zoom">
+      <button>+</button>
+      <div class="zoom-sep"></div>
+      <button>−</button>
+    </div>
+  </div>
+
+  <div class="time-chip">
+    <cv-icon name="clock" [size]="12" color="var(--cv-amber)"/>
+    <span>Ultime 24 ore</span>
+    <cv-icon name="chevron" [size]="11" color="var(--cv-text-mute)" dir="down"/>
+  </div>
+
+  <div class="bottom">
+    <div class="b-head">
+      <div>
+        <div class="b-title">{{ data.activeZone().name }}</div>
+        <div class="b-sub">{{ visiblePins().length }} pin attivi · raggio 1 km</div>
+      </div>
+      <button class="more-filters">
+        <cv-icon name="filter" [size]="13" color="var(--cv-text)"/>
+        Più filtri
+      </button>
+    </div>
+    <div class="filter-chips">
+      <button class="chip"
+              [class.on]="filters().disservizi"
+              [style.--chip-color]="'var(--cv-amber)'"
+              (click)="toggleFilter('disservizi')">
+        @if (!filters().disservizi) { <span class="cdot" style="background: var(--cv-amber)"></span> }
+        Disservizi
+        <span class="count">{{ counts().disservizi }}</span>
+      </button>
+      <button class="chip"
+              [class.on]="filters().sicurezza"
+              [style.--chip-color]="'var(--cv-red)'"
+              (click)="toggleFilter('sicurezza')">
+        @if (!filters().sicurezza) { <span class="cdot" style="background: var(--cv-red)"></span> }
+        Sicurezza
+        <span class="count">{{ counts().sicurezza }}</span>
+      </button>
+      <button class="chip"
+              [class.on]="filters().risolto"
+              [style.--chip-color]="'var(--cv-green)'"
+              (click)="toggleFilter('risolto')">
+        @if (!filters().risolto) { <span class="cdot" style="background: var(--cv-green)"></span> }
+        Risolti
+        <span class="count">{{ counts().risolto }}</span>
+      </button>
+    </div>
+  </div>
+</div>

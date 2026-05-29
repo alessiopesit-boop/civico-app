@@ -1,0 +1,56 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Verifica zona</div>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="body">
+    <div class="map-box">
+      <cv-map-background [height]="220"/>
+      <div class="gps-pulse" [class.active]="pinging()">
+        <div class="ring"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="map-chip">
+        <cv-icon name="pinSmall" [size]="12" color="var(--cv-amber)"/>
+        {{ zone().name }} · {{ zone().city }}
+      </div>
+    </div>
+
+    <h1>Verifica che ci passi davvero</h1>
+    <p>
+      Per segnalare e confermare in <b>{{ zone().name }}</b> serve un ping GPS dalla zona.
+      Un singolo controllo, una volta sola. Non tracciamo la tua posizione nel tempo.
+    </p>
+
+    <div class="rows">
+      <div class="r">
+        <div class="r-icon"><cv-icon name="lock" [size]="13" color="var(--cv-green)"/></div>
+        <span>Un solo ping, niente tracking continuo</span>
+      </div>
+      <div class="r">
+        <div class="r-icon"><cv-icon name="check" [size]="13" color="var(--cv-green)"/></div>
+        <span>Le coordinate vengono scartate dopo</span>
+      </div>
+      <div class="r">
+        <div class="r-icon"><cv-icon name="sparkle" [size]="13" color="var(--cv-amber)"/></div>
+        <span>Badge "Residente attivo" dopo 30 giorni</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <button class="cta" [class.pinging]="pinging()" [disabled]="pinging()" (click)="doPing()">
+      @if (pinging()) {
+        Verifica in corso…
+      } @else {
+        <cv-icon name="locate" [size]="15" color="var(--cv-bg)"/>
+        Verifica con GPS
+      }
+    </button>
+    <button class="later" (click)="back()">Verifico più tardi</button>
+  </div>
+</div>

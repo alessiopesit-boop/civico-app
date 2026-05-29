@@ -1,0 +1,278 @@
+<div class="detail">
+  <!-- Hero photo -->
+  <div class="hero">
+    <cv-photo [kind]="report().photo" [w]="500" [h]="280" [radius]="0"/>
+    <div class="gradient"></div>
+    <div class="hero-count">
+      <cv-icon name="image" [size]="12" color="var(--cv-text)"/> 1 di 3
+    </div>
+    <div class="hero-cat">
+      <cv-category-badge [cat]="report().cat"/>
+    </div>
+  </div>
+
+  <!-- Floating nav -->
+  <div class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <span class="status-pill" [style.color]="statusInfo().color">
+      <span class="dot" [style.background]="statusInfo().color"></span>
+      {{ statusInfo().label }}
+    </span>
+    <div class="topbar-actions">
+      <cv-icon-btn (btnClick)="share()">
+        <cv-icon name="share" [size]="15" color="var(--cv-text)"/>
+      </cv-icon-btn>
+      <cv-icon-btn (btnClick)="openFlag()">
+        <cv-icon name="more" [size]="16" color="var(--cv-text)"/>
+      </cv-icon-btn>
+    </div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="content">
+    <div class="body">
+      <h1 class="title">{{ report().title }}</h1>
+
+      <div class="author">
+        <cv-avatar [userObj]="author()" [size]="26"/>
+        <span class="name">{{ author().name }}</span>
+        <span class="dot"></span>
+        <span class="ago">
+          <cv-icon name="clock" [size]="11" color="var(--cv-text-faint)"/>
+          {{ timeVerbStr() }} {{ report().time }}
+        </span>
+      </div>
+
+      <div class="where">
+        <cv-icon name="pinSmall" [size]="12" color="var(--cv-text-faint)"/>
+        {{ report().where }} · {{ data.activeZone().name }}
+      </div>
+
+      @if (isSec()) {
+        <div class="disclaimer">
+          <div class="d-icon"><cv-icon name="lock" [size]="13" color="var(--cv-red)"/></div>
+          <div class="d-text">
+            <div class="d-title">Non sostituisce 112 o 113</div>
+            <div class="d-sub">Se è in corso, chiama prima. Civico è memoria di zona, non pronto intervento.</div>
+          </div>
+        </div>
+      }
+
+      @if (inResolution()) {
+        <div class="resolution">
+          <div class="r-head">
+            <div class="r-icon"><cv-icon name="check" [size]="13" color="var(--cv-green)"/></div>
+            <div class="r-meta">
+              <div class="r-title">Risoluzione proposta</div>
+              <div class="r-sub">Servono ancora <b>{{ resRemaining() }} conferme</b> per chiuderla</div>
+            </div>
+            <div class="r-count">{{ resVotes() }}/{{ RESOLUTION_GOAL }}</div>
+          </div>
+          <div class="r-bar"><div class="r-fill" [style.width.%]="resPct()"></div></div>
+        </div>
+      }
+
+      @if (!life().isResolved && life().remainingDays > 0) {
+        <div class="lifecycle">
+          <cv-icon name="clock" [size]="11" color="var(--cv-text-faint)"/>
+          Attiva ancora <b>{{ life().remainingDays }} {{ life().remainingDays === 1 ? 'giorno' : 'giorni' }}</b>
+          @if (life().extensionDays > 0) {
+            <span>· estesa dalle conferme</span>
+          }
+        </div>
+      }
+
+      <button class="cta-confirm" [class.locked]="!isActive()" (click)="openConfirmSheet()">
+        @if (isActive()) {
+          <cv-icon name="hand" [size]="17" color="var(--cv-bg)"/>
+          Anche io l'ho visto
+        } @else {
+          <cv-icon name="lock" [size]="15" color="var(--cv-text-mute)"/>
+          Verifica numero per confermare
+        }
+      </button>
+      <div class="cta-sub">Tocca per scegliere: visto / peggiorato / non c'è più</div>
+
+      <button class="follow" [class.on]="isFollowing()" (click)="toggleFollow()">
+        <div class="f-icon" [class.on]="isFollowing()">
+          <cv-icon name="bell" [size]="15" [color]="isFollowing() ? 'var(--cv-amber)' : 'var(--cv-text-mute)'"/>
+        </div>
+        <div class="f-text">
+          <div class="f-title">{{ isFollowing() ? 'Stai seguendo' : 'Segui questa segnalazione' }}</div>
+          <div class="f-sub">{{ isFollowing() ? 'Riceverai un avviso quando cambia stato' : 'Notifica quando cambia stato (senza dover confermare)' }}</div>
+        </div>
+        <span class="f-toggle" [class.on]="isFollowing()">{{ isFollowing() ? 'ON' : 'OFF' }}</span>
+      </button>
+
+      <!-- Chi conferma -->
+      <div class="section-eyebrow">Chi conferma</div>
+      <div class="confirms">
+        <div class="avatars">
+          @for (u of topAvatars; track u; let i = $index) {
+            <div class="av-slot" [style.margin-left.px]="i === 0 ? 0 : -11">
+              <cv-avatar [user]="u" [size]="32" [ring]="true"/>
+            </div>
+          }
+          @if (report().confirms > 5) {
+            <div class="more-pill">+{{ report().confirms - 5 }}</div>
+          }
+        </div>
+        <div class="confirms-info">
+          <div class="confirms-row">
+            <span class="confirms-num">{{ report().confirms }} confermano</span>
+            @if (report().recent6h > 0) {
+              <span class="trend-pill">
+                <cv-icon name="trend" [size]="11" color="var(--cv-green)"/>
+                +{{ report().recent6h }} ultime 6h
+              </span>
+            }
+          </div>
+          <div class="breakdown">
+            {{ Math.max(report().confirms - 5, 0) }} visto · 3 peggiorata · 2 non c'è più
+          </div>
+        </div>
+      </div>
+
+      <!-- Posizione -->
+      <div class="section-eyebrow">Posizione</div>
+      <div class="mini-map">
+        <cv-map-background [height]="138"/>
+        <cv-map-pin [pin]="{ id: report().id, cat: report().cat, xp: 0.5, yp: 0.5 }"
+                    [big]="true" [styleOverride]="'coda'"/>
+        <div class="map-chip">{{ report().where }} · 80m</div>
+      </div>
+
+      <!-- Cronologia -->
+      <div class="section-eyebrow">Cronologia</div>
+      <div class="timeline">
+        @for (s of timeline(); track s.label) {
+          <div class="step" [class.last]="s.last">
+            @if (!s.last) {
+              <div class="rail" [class.rail-done]="s.done"></div>
+            }
+            <div class="bullet" [class.done]="s.done" [class.current]="s.current">
+              @if (s.done) {
+                <cv-icon name="check" [size]="11" color="var(--cv-bg)"/>
+              } @else if (s.current) {
+                <div class="inner current"></div>
+              } @else {
+                <div class="inner"></div>
+              }
+            </div>
+            <div class="step-text">
+              <div class="step-row">
+                <div class="step-label" [class.active]="s.done || s.current">{{ s.label }}</div>
+                <div class="step-time">{{ s.time }}</div>
+              </div>
+              <div class="step-sub">{{ s.sub }}</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (report().cat !== 'risolto') {
+        <button class="propose" (click)="proposeResolved()">
+          <cv-icon name="check" [size]="14" color="var(--cv-green)"/>
+          {{ inResolution() ? 'Confermo: è risolta' : 'Proponi come risolta' }}
+        </button>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Confirm sheet -->
+@if (confirmSheetOpen()) {
+  <div class="overlay" (click)="closeConfirmSheet()">
+    <div class="sheet" (click)="$event.stopPropagation()">
+      <div class="grip-wrap"><div class="grip"></div></div>
+      <div class="sheet-head">
+        <div class="sheet-title">Cosa hai visto?</div>
+        <div class="sheet-sub">La tua conferma aiuta a capire se la situazione sta cambiando.</div>
+      </div>
+      <div class="sheet-card">
+        <cv-photo [kind]="report().photo" [w]="40" [h]="40" [radius]="8"/>
+        <div class="sheet-card-text">
+          <div class="sheet-card-title">{{ report().title }}</div>
+          <div class="sheet-card-where">{{ report().where }}</div>
+        </div>
+      </div>
+      <div class="sheet-options">
+        <button class="opt" (click)="confirmAction('vista')">
+          <div class="opt-icon green"><cv-icon name="hand" [size]="18" color="var(--cv-green)"/></div>
+          <div class="opt-text">
+            <div class="opt-title">L'ho vista anch'io</div>
+            <div class="opt-sub">È ancora lì, come segnalata</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="opt" (click)="confirmAction('peggiore')">
+          <div class="opt-icon amber rotated"><cv-icon name="arrowUp" [size]="18" color="var(--cv-amber)" dir="down"/></div>
+          <div class="opt-text">
+            <div class="opt-title">È peggiorata</div>
+            <div class="opt-sub">La situazione è cambiata in peggio</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="opt" (click)="confirmAction('risolta')">
+          <div class="opt-icon green"><cv-icon name="check" [size]="18" color="var(--cv-green)"/></div>
+          <div class="opt-text">
+            <div class="opt-title">Non c'è più</div>
+            <div class="opt-sub">Sembra risolta</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+      </div>
+      <button class="sheet-cancel" (click)="closeConfirmSheet()">Annulla</button>
+    </div>
+  </div>
+}
+
+<!-- Flag sheet -->
+@if (flagSheetOpen()) {
+  <div class="overlay" (click)="closeFlag()">
+    <div class="sheet" (click)="$event.stopPropagation()">
+      <div class="grip-wrap"><div class="grip"></div></div>
+      <div class="sheet-head">
+        <div class="sheet-title">Segnala questo report</div>
+        <div class="sheet-sub">Tre segnalazioni la mettono in revisione. Le segnalazioni infondate riducono il tuo peso voto.</div>
+      </div>
+      <div class="sheet-options">
+        <button class="opt" (click)="flagReport('falsa')">
+          <div class="opt-icon red"><cv-icon name="flag" [size]="15" color="var(--cv-red)"/></div>
+          <div class="opt-text">
+            <div class="opt-title">Falsa o inventata</div>
+            <div class="opt-sub">Non corrisponde a fatti</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="opt" (click)="flagReport('duplicato')">
+          <div class="opt-icon amber"><cv-icon name="flag" [size]="15" color="var(--cv-amber)"/></div>
+          <div class="opt-text">
+            <div class="opt-title">Duplicato</div>
+            <div class="opt-sub">Segnalata già da un altro vicino</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="opt" (click)="flagReport('esagerata')">
+          <div class="opt-icon amber"><cv-icon name="flag" [size]="15" color="var(--cv-amber)"/></div>
+          <div class="opt-text">
+            <div class="opt-title">Esagerata</div>
+            <div class="opt-sub">Drammatica oltre i fatti</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="opt" (click)="flagReport('offensiva')">
+          <div class="opt-icon red"><cv-icon name="flag" [size]="15" color="var(--cv-red)"/></div>
+          <div class="opt-text">
+            <div class="opt-title">Offensiva o impropria</div>
+            <div class="opt-sub">Linguaggio o contenuti inadeguati</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+      </div>
+      <button class="sheet-cancel" (click)="closeFlag()">Annulla</button>
+    </div>
+  </div>
+}

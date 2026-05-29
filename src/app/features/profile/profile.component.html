@@ -1,0 +1,95 @@
+<div class="screen">
+  <div class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <cv-icon-btn (btnClick)="goSettings()">
+      <cv-icon name="settings" [size]="16" color="var(--cv-text)"/>
+    </cv-icon-btn>
+  </div>
+
+  <div class="head">
+    <cv-avatar [userObj]="me()" [size]="64"/>
+    <div class="meta">
+      <div class="name">{{ me().name }}</div>
+      <div class="loc">
+        <cv-icon name="pinSmall" [size]="11" color="var(--cv-text-faint)"/>
+        Trastevere, Roma
+      </div>
+      <div class="role">
+        <cv-icon name="sparkle" [size]="11" color="var(--cv-amber)"/>
+        CITTADINO ATTIVO
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-card">
+    <div class="pc-head">
+      <div class="pc-title">Prossimo: <span class="green">Pilastro della zona</span></div>
+      <div class="pc-count">14 / 20</div>
+    </div>
+    <div class="pc-bar">
+      <div class="pc-fill"></div>
+    </div>
+    <div class="pc-foot">6 segnalazioni in più per il prossimo livello.</div>
+  </div>
+
+  <div class="stats">
+    @for (s of stats(); track s.label) {
+      <div class="stat">
+        <div class="stat-row">
+          <div class="stat-num">{{ s.value }}</div>
+          @if (s.trend) { <span class="stat-trend">{{ s.trend }}</span> }
+        </div>
+        <div class="stat-label">{{ s.label }}</div>
+        <div class="stat-sub">{{ s.sub }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="eyebrow">Badge sbloccati</div>
+  <div class="badges">
+    @for (b of badges; track b.label) {
+      <div class="badge" [class.locked]="b.locked">
+        <div class="b-bubble" [style.background]="b.locked ? 'var(--cv-surface-3)' : b.color">
+          @if (b.locked) {
+            <cv-icon name="lock" [size]="13" color="var(--cv-text-mute)"/>
+          } @else {
+            <cv-icon name="check" [size]="14" color="var(--cv-bg)"/>
+          }
+        </div>
+        <div class="b-label">{{ b.label }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="eyebrow row">
+    <span>Le mie segnalazioni</span>
+    <button class="all-btn">Tutte <cv-icon name="chevron" [size]="11" color="var(--cv-text-mute)"/></button>
+  </div>
+
+  <div class="reports">
+    @for (r of myReports(); track r.id) {
+      <button class="report-row" (click)="openReport(r.id)">
+        <cv-photo [kind]="r.photo" [w]="52" [h]="52" [radius]="10"/>
+        <div class="rr-meta">
+          <div class="rr-cat" [style.color]="CATS[r.cat].color">
+            <cv-icon [name]="CATS[r.cat].iconName" [size]="11" [color]="CATS[r.cat].color"/>
+            {{ CATS[r.cat].label }}
+          </div>
+          <div class="rr-title">{{ r.title }}</div>
+          <div class="rr-where">
+            <cv-icon name="pinSmall" [size]="10" color="var(--cv-text-faint)"/>
+            {{ r.where }} · {{ r.time }}
+          </div>
+        </div>
+        <div class="rr-right">
+          <div class="rr-num" [class.resolved]="r.cat === 'risolto'">{{ r.confirms }}</div>
+          <div class="rr-num-lab">CONFERME</div>
+        </div>
+      </button>
+    } @empty {
+      <div class="empty">Nessuna segnalazione ancora.</div>
+    }
+  </div>
+</div>

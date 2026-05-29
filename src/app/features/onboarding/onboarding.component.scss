@@ -1,0 +1,133 @@
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--cv-safe-top);
+  padding-bottom: calc(var(--cv-safe-bottom) + 6px);
+}
+
+.hero {
+  position: relative;
+  height: 260px;
+  margin: 16px 18px 0;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 17, 21, 0) 50%, rgba(15, 17, 21, 0.95) 100%);
+  pointer-events: none;
+}
+
+.wordmark-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  background: rgba(15, 17, 21, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--cv-border);
+}
+
+.content {
+  padding: 24px 22px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.headline {
+  color: var(--cv-text);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  margin: 0;
+}
+.amber { color: var(--cv-amber); }
+
+.sub {
+  color: var(--cv-text-mute);
+  font-size: 14.5px;
+  font-weight: 500;
+  margin-top: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.1px;
+}
+
+.bullets {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bullet {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.title {
+  color: var(--cv-text);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.bsub {
+  color: var(--cv-text-mute);
+  font-size: 12.5px;
+  font-weight: 500;
+  margin-top: 2px;
+  line-height: 1.45;
+}
+
+.actions {
+  padding: 0 18px 8px;
+}
+.primary {
+  width: 100%;
+  padding: 15px 16px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  background: var(--cv-amber);
+  color: var(--cv-bg);
+  font-weight: 800;
+  font-size: 15.5px;
+  letter-spacing: -0.1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow:
+    0 0 0 4px rgba(245, 165, 36, 0.18),
+    0 10px 20px rgba(245, 165, 36, 0.28);
+}
+.ghost {
+  width: 100%;
+  padding: 13px 16px;
+  margin-top: 8px;
+  background: transparent;
+  color: var(--cv-text-mute);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}

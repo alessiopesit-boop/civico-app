@@ -1,0 +1,204 @@
+.screen { position: absolute; inset: 0; }
+
+.map-wrap {
+  position: absolute;
+  inset: 0;
+  background: var(--cv-bg-map);
+  overflow: hidden;
+}
+
+.cluster {
+  position: absolute;
+  left: 65%; top: 57%;
+  transform: translate(-50%, -50%);
+  width: 44px; height: 44px;
+  border-radius: 22px;
+  background: var(--cv-amber);
+  border: 2px solid rgba(0, 0, 0, 0.55);
+  box-shadow:
+    0 0 0 4px rgba(245, 165, 36, 0.13),
+    0 8px 16px rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cv-bg);
+  font-weight: 800;
+  font-size: 13.5px;
+}
+
+.you {
+  position: absolute;
+  left: 44%; top: 50%;
+  width: 16px; height: 16px;
+  border-radius: 8px;
+  background: var(--cv-blue-solid);
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 0 6px rgba(91, 183, 255, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+}
+
+.top {
+  position: absolute;
+  top: var(--cv-safe-top);
+  left: 14px; right: 14px;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+}
+.search {
+  flex: 1;
+  height: 36px;
+  border-radius: 18px;
+  background: rgba(15, 17, 21, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--cv-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 12px;
+  span {
+    color: var(--cv-text-mute);
+    font-size: 13.5px;
+    font-weight: 500;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sep { width: 1px; height: 16px; background: var(--cv-border); }
+}
+
+.rail {
+  position: absolute;
+  right: 14px; top: 130px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.zoom {
+  width: 36px;
+  border-radius: 12px;
+  background: var(--cv-surface-2);
+  border: 1px solid var(--cv-border);
+  overflow: hidden;
+  button {
+    width: 100%;
+    height: 36px;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--cv-text);
+    font-family: var(--cv-font);
+    font-weight: 700;
+    font-size: 18px;
+    padding: 0;
+  }
+  .zoom-sep { height: 1px; background: var(--cv-border); }
+}
+
+.time-chip {
+  position: absolute;
+  left: 50%; top: 116px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 9px;
+  border-radius: 999px;
+  z-index: 5;
+  background: rgba(15, 17, 21, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--cv-border);
+  color: var(--cv-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bottom {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 6;
+  padding-bottom: calc(var(--cv-safe-bottom) + 12px);
+  padding-top: 10px;
+  background: linear-gradient(180deg, rgba(15, 17, 21, 0) 0%, rgba(15, 17, 21, 0.95) 50%);
+}
+.b-head {
+  padding: 0 14px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.b-title {
+  color: var(--cv-text);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.b-sub {
+  color: var(--cv-text-mute);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 1px;
+}
+.more-filters {
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--cv-surface-2);
+  color: var(--cv-text);
+  border: 1px solid var(--cv-border);
+  font-family: var(--cv-font);
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filter-chips {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+.chip {
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--cv-surface-2);
+  color: var(--cv-text);
+  border: 1px solid var(--cv-border);
+  font-family: var(--cv-font);
+  font-weight: 700;
+  font-size: 12.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &.on {
+    background: var(--chip-color);
+    color: var(--cv-bg);
+    border-color: transparent;
+    .count { background: rgba(0, 0, 0, 0.18); }
+  }
+  .cdot {
+    width: 7px; height: 7px;
+    border-radius: 4px;
+  }
+  .count {
+    font-size: 10.5px;
+    font-weight: 700;
+    opacity: 0.7;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}

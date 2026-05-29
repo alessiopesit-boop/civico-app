@@ -1,0 +1,57 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Aggiungi zona</div>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="body">
+    <h1>Dove vuoi seguire?</h1>
+    <p>Cerca un quartiere, una zona o un comune.</p>
+
+    <div class="search">
+      <cv-icon name="search" [size]="16" color="var(--cv-text-mute)"/>
+      <input type="text" placeholder="Es. Pigneto, Garbatella…"
+             [ngModel]="query()" (ngModelChange)="setQuery($event)" name="zoneQuery"/>
+    </div>
+
+    <div class="eyebrow">Suggerimenti</div>
+    <div class="suggestions">
+      @for (s of suggestions(); track s.name) {
+        <button class="sug"
+                [class.on]="selected()?.name === s.name"
+                (click)="pick(s)">
+          <cv-icon name="pinSmall" [size]="14"
+                   [color]="selected()?.name === s.name ? 'var(--cv-amber)' : 'var(--cv-text-mute)'"/>
+          <div class="sug-meta">
+            <div class="sug-name">{{ s.name }}</div>
+            <div class="sug-city">{{ s.city }}</div>
+          </div>
+          @if (selected()?.name === s.name) {
+            <cv-icon name="check" [size]="14" color="var(--cv-amber)"/>
+          }
+        </button>
+      }
+    </div>
+
+    @if (selected()) {
+      <div class="eyebrow">Che cos'è per te?</div>
+      <div class="role-grid">
+        @for (r of roles; track r.k) {
+          <button class="role-tile" [class.on]="role() === r.k" (click)="role.set(r.k)">
+            <div class="role-name">{{ r.label }}</div>
+            <div class="role-sub">{{ r.sub }}</div>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="cta-bar">
+    <button class="cta" [class.is-enabled]="!!selected()" [disabled]="!selected()" (click)="confirm()">
+      {{ selected() ? 'Continua → verifica GPS' : 'Scegli una zona' }}
+    </button>
+  </div>
+</div>

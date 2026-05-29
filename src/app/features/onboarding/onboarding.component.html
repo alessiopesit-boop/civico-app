@@ -1,0 +1,39 @@
+<div class="screen">
+  <div class="hero">
+    <cv-map-background [height]="260"/>
+    <div class="fade"></div>
+    @for (p of pins; track p.id) {
+      <cv-map-pin [pin]="p" [big]="$first" styleOverride="coda"/>
+    }
+    <div class="wordmark-chip">
+      <cv-wordmark [size]="13"/>
+    </div>
+  </div>
+
+  <div class="content">
+    <h1 class="headline">Dalla gente,<br><span class="amber">per la gente.</span></h1>
+    <p class="sub">Civico è il portale della tua zona: fatto dai cittadini, non dal Comune. Non aspettiamo che le cose si sistemino da sole.</p>
+
+    <ul class="bullets">
+      @for (b of bullets; track b.title) {
+        <li class="bullet">
+          <div class="icon-wrap" [style.background]="b.bg">
+            <cv-icon [name]="b.iconName" [size]="b.iconName === 'hand' ? 16 : 18" [color]="b.color"/>
+          </div>
+          <div>
+            <div class="title">{{ b.title }}</div>
+            <div class="bsub">{{ b.sub }}</div>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="primary" (click)="proceed()">
+      Imposta la mia zona
+      <cv-icon name="arrow" [size]="15" color="#0F1115" dir="right"/>
+    </button>
+    <button type="button" class="ghost" (click)="proceed()">Ho già un account</button>
+  </div>
+</div>

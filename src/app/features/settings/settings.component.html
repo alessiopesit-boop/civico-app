@@ -1,0 +1,158 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <div class="title">Impostazioni</div>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="content">
+    <section class="sect">
+      <div class="eyebrow">Mappa</div>
+      <div class="group">
+        <div class="row" tabindex="0">
+          <div class="row-text">
+            <div class="row-title">Stile pin</div>
+            <div class="row-sub">Come appaiono i pin sulla mappa</div>
+          </div>
+          <div class="seg-radio">
+            @for (s of pinStyles; track s) {
+              <button class="seg" [class.on]="settings.pinStyle() === s" (click)="setPinStyle(s)">
+                {{ s }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="eyebrow">Card</div>
+      <div class="group">
+        <div class="row">
+          <div class="row-text">
+            <div class="row-title">Foto nelle card</div>
+            <div class="row-sub">Mostra l'anteprima nelle segnalazioni del feed</div>
+          </div>
+          <button class="toggle" [class.on]="settings.showPhoto()" (click)="togglePhoto()">
+            <span class="knob"></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="eyebrow">Le mie zone</div>
+      <div class="group">
+        <a class="row" routerLink="/zones">
+          <div class="row-text">
+            <div class="row-title">Gestisci zone</div>
+            <div class="row-sub">Casa, lavoro, dove passi spesso</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+        <a class="row" routerLink="/zones/add">
+          <div class="row-text">
+            <div class="row-title">Aggiungi nuova zona</div>
+            <div class="row-sub">Richiede un ping GPS quando ci passi</div>
+          </div>
+          <cv-icon name="plus" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="eyebrow">Privacy</div>
+      <div class="group">
+        <div class="row">
+          <div class="row-text">
+            <div class="row-title">Anonimo su Sicurezza</div>
+            <div class="row-sub">Le segnalazioni di sicurezza nascondono il tuo nome per default</div>
+          </div>
+          <button class="toggle" [class.on]="settings.privacyAnonDefault()" (click)="toggleAnonDefault()">
+            <span class="knob"></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="eyebrow">Notifiche</div>
+      <div class="group">
+        <div class="row">
+          <div class="row-text">
+            <div class="row-title">Notifiche push</div>
+            <div class="row-sub">Per nuove segnalazioni vicine, conferme, risoluzioni</div>
+          </div>
+          <button class="toggle" [class.on]="settings.notificationsPush()" (click)="togglePush()">
+            <span class="knob"></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="eyebrow">Info & policy</div>
+      <div class="group">
+        <a class="row" routerLink="/info" [queryParams]="{ tab: 'come' }">
+          <div class="row-text">
+            <div class="row-title">Come funziona Civico</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+        <a class="row" routerLink="/info" [queryParams]="{ tab: 'regole' }">
+          <div class="row-text">
+            <div class="row-title">Regole della community</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+        <a class="row" routerLink="/info" [queryParams]="{ tab: 'privacy' }">
+          <div class="row-text">
+            <div class="row-title">Privacy</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+        <a class="row" routerLink="/info" [queryParams]="{ tab: 'termini' }">
+          <div class="row-text">
+            <div class="row-title">Termini di servizio</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+      </div>
+    </section>
+
+    <section class="sect">
+      <div class="eyebrow">Account</div>
+      <div class="group">
+        <a class="row" routerLink="/storico">
+          <div class="row-text">
+            <div class="row-title">Storico segnalazioni</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </a>
+        <button class="row" (click)="resetOnboarding()">
+          <div class="row-text">
+            <div class="row-title">Rivedi introduzione</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="row" (click)="logout()">
+          <div class="row-text">
+            <div class="row-title">Esci</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+      </div>
+    </section>
+
+    <div class="footer-link">
+      <span>Sei un Comune? La vista Sindaco è in arrivo.</span>
+    </div>
+
+    <div class="version">
+      Civico è un progetto della rete civica.<br>
+      {{ buildLabel }} · fatta dai cittadini.
+    </div>
+  </div>
+</div>

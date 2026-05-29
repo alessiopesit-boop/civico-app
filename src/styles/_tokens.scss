@@ -1,0 +1,45 @@
+// Civico design tokens.
+// Ported from civico-app/project/shared.jsx (the `C` palette).
+
+:root {
+  --cv-bg:         #0F1115;
+  --cv-bg-map:     #0B0D11;
+  --cv-bg-page:    #0a0b0e;
+  --cv-surface:    #171A20;
+  --cv-surface-2:  #1E2229;
+  --cv-surface-3:  #262A33;
+
+  --cv-border:     rgba(255, 255, 255, 0.08);
+  --cv-border-s:   rgba(255, 255, 255, 0.05);
+  --cv-border-m:   rgba(255, 255, 255, 0.12);
+
+  --cv-text:       #F4F2EE;
+  --cv-text-mute:  rgba(244, 242, 238, 0.6);
+  --cv-text-faint: rgba(244, 242, 238, 0.4);
+  --cv-text-ghost: rgba(244, 242, 238, 0.25);
+
+  --cv-amber:      #F5A524;
+  --cv-amber-d:    #C48516;
+  --cv-amber-soft: rgba(245, 165, 36, 0.14);
+
+  --cv-red:        #E5484D;
+  --cv-red-d:      #C13338;
+  --cv-red-soft:   rgba(229, 72, 77, 0.14);
+
+  --cv-green:      #3FB984;
+  --cv-green-d:    #2D9568;
+  --cv-green-soft: rgba(63, 185, 132, 0.14);
+
+  --cv-blue:       rgba(120, 150, 200, 0.10);
+  --cv-blue-solid: #5BB7FF;
+
+  --cv-font: 'Manrope', -apple-system, system-ui, sans-serif;
+  --cv-font-mono: ui-monospace, Menlo, monospace;
+
+  // Layout
+  --cv-safe-top: 14px;
+  --cv-safe-bottom: 14px;
+  --cv-shell-w: 390px;
+  --cv-shell-h: 844px;
+  --cv-shell-radius: 38px;
+}

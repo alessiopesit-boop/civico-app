@@ -1,0 +1,184 @@
+<div class="home">
+  <!-- MAP -->
+  <div class="map-wrap" [style.height.px]="containerH()">
+    @if (useGoogleMap()) {
+      <cv-google-map [pins]="data.pins()"
+                     [dimmedIds]="dimmedPinIds()"
+                     (pinClick)="goDetail($event.id)"/>
+    } @else {
+      <cv-map-background [height]="containerH()"/>
+      @for (p of data.pins(); track p.id) {
+        <cv-map-pin [pin]="p"
+                    [dim]="dimmedPinIds().has(p.id)"
+                    [big]="p.id === 1"
+                    (pinClick)="goDetail(p.id)"/>
+      }
+      <div class="you" aria-hidden="true">
+        <div class="you-pulse"></div>
+      </div>
+    }
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="row">
+      <cv-wordmark/>
+      <div class="actions">
+        <cv-icon-btn (btnClick)="goMap()">
+          <cv-icon name="search" [size]="16" color="var(--cv-text)"/>
+        </cv-icon-btn>
+        <cv-icon-btn [badge]="data.unreadNotificationsCount() || null" (btnClick)="goNotifications()">
+          <cv-icon name="bell" [size]="17" color="var(--cv-text)"/>
+        </cv-icon-btn>
+        <button class="avatar-btn" (click)="goProfile()" aria-label="Profilo">
+          <cv-avatar [user]="isGuest() ? 'anon' : identity()" [size]="36"/>
+        </button>
+      </div>
+    </div>
+
+    <div class="row chips">
+      <div class="loc-area">
+        <cv-location-chip [name]="data.activeZone().name"
+                          [sub]="data.activeZone().city"
+                          [comuneActive]="data.activeZone().comuneActive ?? false"
+                          (chipClick)="openZonePicker()"/>
+      </div>
+      <div class="counter">
+        <span class="cdot" [style.background]="activeFilterDotColor()"></span>
+        <span class="ctext">{{ data.activeCount() }} attive</span>
+      </div>
+    </div>
+
+    @if (isGuest() || isBase()) {
+      <button class="acct-banner" [class.is-base]="isBase()" (click)="tapAccountBanner()">
+        <div class="acct-icon">
+          @if (isGuest()) {
+            <cv-icon name="search" [size]="12" color="var(--cv-text-mute)"/>
+          } @else {
+            <cv-icon name="lock" [size]="12" color="var(--cv-amber)"/>
+          }
+        </div>
+        <div class="acct-text">
+          <div class="acct-title">
+            @if (isGuest()) { Stai esplorando come ospite }
+            @else { Verifica numero per partecipare }
+          </div>
+          <div class="acct-sub">
+            @if (isGuest()) { Accedi per segnalare o confermare }
+            @else { Diventa account attivo, è un OTP }
+          </div>
+        </div>
+        <cv-icon name="chevron" [size]="12" color="var(--cv-text-faint)"/>
+      </button>
+    }
+  </div>
+
+  <!-- Map controls + FAB -->
+  <div class="map-controls"
+       [style.bottom.px]="sheetH() + 12"
+       [class.dragging]="isDragging()"
+       [class.hidden]="!showControls()">
+    <cv-icon-btn (btnClick)="goMap()">
+      <cv-icon name="layers" [size]="16" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <cv-icon-btn>
+      <cv-icon name="locate" [size]="16" color="var(--cv-text)"/>
+    </cv-icon-btn>
+  </div>
+
+  <button class="fab"
+          [style.bottom.px]="sheetH() + (showControls() ? 92 : 12)"
+          [class.dragging]="isDragging()"
+          [class.hidden]="!showFab()"
+          [class.locked]="!isActive()"
+          (click)="tapFab()">
+    @if (isActive()) {
+      <cv-icon name="plus" [size]="24" color="var(--cv-bg)"/>
+    } @else {
+      <cv-icon name="lock" [size]="20" color="var(--cv-text-mute)"/>
+    }
+  </button>
+
+  <!-- Bottom sheet -->
+  <section class="sheet"
+           [style.height.px]="sheetH()"
+           [class.dragging]="isDragging()">
+    <div class="drag-area"
+         (pointerdown)="startDrag($event)"
+         (touchstart)="startDrag($event)">
+      <div class="grip"></div>
+    </div>
+
+    <div class="sheet-head">
+      <div class="head-text">
+        <div class="head-title">Vicino a te</div>
+        <div class="head-sub">
+          <cv-icon name="arrowUp" [size]="11" color="var(--cv-green)"/>
+          <span><b>+12</b> oggi nella tua zona</span>
+        </div>
+      </div>
+
+      <div class="sort-wrap">
+        <button class="sort-btn" [class.open]="sortOpen()" (click)="toggleSort()">
+          {{ sortLabels[data.sort()] }}
+          <cv-icon name="chevron" [size]="11" color="var(--cv-text-mute)" [dir]="sortOpen() ? 'up' : 'down'"/>
+        </button>
+        @if (sortOpen()) {
+          <div class="sort-overlay" (click)="closeSort()"></div>
+          <div class="sort-menu">
+            @for (k of sortOptionsKeys; track k) {
+              <button class="sort-item" [class.active]="data.sort() === k" (click)="setSort(k)">
+                {{ sortLabels[k] }}
+                @if (data.sort() === k) {
+                  <cv-icon name="check" [size]="13" color="var(--cv-amber)"/>
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="filter-chips">
+      @for (f of filters; track f.k) {
+        <button class="chip"
+                [class.on]="data.filter() === f.k"
+                [class.has-color]="f.color"
+                [style.--chip-color]="f.color"
+                (click)="setFilter(f.k)">
+          @if (f.color && data.filter() !== f.k) {
+            <span class="cdot" [style.background]="f.color"></span>
+          }
+          {{ f.label }}
+        </button>
+      }
+    </div>
+
+    <div class="feed">
+      @if (polsoVisible()) {
+        <cv-polso-card
+          [zoneName]="data.activeZone().name"
+          [stats]="{ aperte: 18, risolte: 7, hotStreet: 'Via Garibaldi' }"
+          (open)="goStorico()"
+          (dismiss)="dismissPolso()"/>
+      }
+
+      @for (r of data.visibleReports(); track r.id) {
+        <cv-report-card [r]="r" (cardClick)="goDetail(r.id)"/>
+      }
+
+      @if (data.visibleReports().length === 0) {
+        <div class="empty">Nessuna segnalazione in questa categoria.</div>
+      }
+      <div class="bottom-space"></div>
+    </div>
+  </section>
+
+  @if (zonePickerOpen()) {
+    <cv-zone-picker-sheet
+      [zones]="data.zones()"
+      [activeId]="data.activeZoneId()"
+      (picked)="pickZone($event)"
+      (closed)="closeZonePicker()"/>
+  }
+</div>

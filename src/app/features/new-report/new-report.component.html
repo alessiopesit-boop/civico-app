@@ -1,0 +1,165 @@
+<div class="screen">
+  <header class="topbar">
+    <button class="back" (click)="back()">
+      @if (step() > 1) {
+        <cv-icon name="arrow" [size]="18" color="var(--cv-text)"/> Indietro
+      } @else {
+        <cv-icon name="close" [size]="20" color="var(--cv-text)"/>
+      }
+    </button>
+    <div class="counter">{{ step() }} di 3</div>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="progress">
+    @for (cls of progressClasses(); track $index) {
+      <div class="bar" [class.fill]="cls === 'fill'"></div>
+    }
+  </div>
+
+  <div class="body">
+    @switch (step()) {
+      @case (1) {
+        <section class="block">
+          <h1 class="heading">Foto e categoria</h1>
+          <p class="sub">Una foto vale 100 parole. Scegli cosa hai visto.</p>
+
+          <button class="photo-slot" [class.has]="hasPhoto()" (click)="togglePhoto()">
+            @if (hasPhoto()) {
+              <cv-photo [kind]="photoKind()" [w]="350" [h]="188" [radius]="16"/>
+              <span class="badge-shot">SCATTATA</span>
+            } @else {
+              <div class="ph-icon">
+                <cv-icon name="camera" [size]="26" color="var(--cv-text)"/>
+              </div>
+              <div class="ph-title">Tocca per fotografare</div>
+              <div class="ph-sub">
+                <cv-icon name="image" [size]="14" color="var(--cv-text-mute)"/>
+                oppure scegli dalla galleria
+              </div>
+            }
+          </button>
+
+          <div class="eyebrow">Categoria</div>
+          <div class="cat-grid">
+            @for (k of catList; track k) {
+              <button class="cat-tile"
+                      [class.active]="cat() === k"
+                      [style.--cat-color]="CATS[k].color"
+                      (click)="selectCategory(k)">
+                <div class="cat-bubble" [style.background]="CATS[k].color">
+                  <cv-icon [name]="CATS[k].iconName" [size]="15" color="#0F1115"/>
+                </div>
+                <div class="cat-label">{{ CATS[k].label }}</div>
+              </button>
+            }
+          </div>
+
+          @if (isSec()) {
+            <div class="warn">
+              <cv-icon name="lock" [size]="14" color="var(--cv-red)"/>
+              <div>Le segnalazioni di sicurezza sono <b>anonime per default</b>.</div>
+            </div>
+          }
+        </section>
+      }
+
+      @case (2) {
+        <section class="block">
+          <h1 class="heading">Dove l'hai vista?</h1>
+          <p class="sub">Trascina il pin sul punto esatto. Puoi pinnare ovunque, non solo dove sei.</p>
+
+          <div class="map-box">
+            <cv-map-background [height]="340"/>
+            <div class="placed-pin" aria-hidden="true">
+              <div class="placed-circle" [style.background]="catMeta().color"
+                   [style.--ring-color]="catMeta().color + '22'">
+                <cv-icon [name]="catMeta().iconName" [size]="20" color="#0F1115"/>
+              </div>
+              <div class="placed-tail" [style.border-top-color]="catMeta().color"></div>
+              <div class="placed-shadow"></div>
+            </div>
+            <div class="place-chip">
+              <cv-icon name="pinSmall" [size]="14" [color]="catMeta().color"/>
+              <div class="place-text">
+                <div class="place-label">{{ place().label }}</div>
+                <div class="place-sub">{{ place().sub }}</div>
+              </div>
+            </div>
+            <div class="map-locate">
+              <cv-icon-btn>
+                <cv-icon name="locate" [size]="16" color="var(--cv-text)"/>
+              </cv-icon-btn>
+            </div>
+          </div>
+
+          <div class="info-tip">
+            <div class="tip-icon"><cv-icon name="info" [size]="15" color="var(--cv-amber)"/></div>
+            <div>Non sei vincolato al GPS, puoi pinnare ovunque sulla mappa.</div>
+          </div>
+        </section>
+      }
+
+      @case (3) {
+        <section class="block">
+          <h1 class="heading">{{ isSec() ? 'Cosa è successo?' : 'Aggiungi un dettaglio' }}</h1>
+          <p class="sub">
+            {{ isSec() ? 'Una nota breve aiuta gli altri a riconoscerla. Anonimato attivo.' : 'Una nota breve aiuta chi passa di là.' }}
+          </p>
+
+          <div class="recap">
+            <cv-photo [kind]="photoKind()" [w]="48" [h]="48" [radius]="9"/>
+            <div class="recap-text">
+              <cv-category-badge [cat]="cat()" [sm]="true"/>
+              <div class="recap-where">
+                <cv-icon name="pinSmall" [size]="11" color="var(--cv-text-faint)"/>
+                {{ place().label }}
+              </div>
+            </div>
+          </div>
+
+          @if (isSec()) {
+            <div class="sec-warn">
+              <div class="sw-icon"><cv-icon name="lock" [size]="14" color="var(--cv-red)"/></div>
+              <div>
+                <div class="sw-title">Stai segnalando un fatto di sicurezza</div>
+                <div class="sw-sub">Non inserire targhe, indirizzi precisi di vittime o dati personali. Civico è una rete civica, non un canale d'emergenza.</div>
+              </div>
+            </div>
+          }
+
+          <textarea class="desc"
+            rows="5" maxlength="280"
+            [placeholder]="isSec() ? 'Es. Verso le 2, allarme di un\'auto. Quando mi sono affacciato c\'erano due figure che si allontanavano…' : 'Es. La buca si è allargata dopo le piogge. Macchine la prendono in pieno, soprattutto la sera quando il lampione è spento.'"
+            [ngModel]="desc()" (ngModelChange)="setDesc($event)" name="desc"></textarea>
+          <div class="char-count">{{ desc().length }} / 280</div>
+
+          <div class="identity">
+            <cv-avatar [user]="identityKey()" [size]="36"/>
+            <div class="i-text">
+              <div class="i-name">{{ anon() ? 'Anonimo' : 'Marco T.' }}</div>
+              <div class="i-sub">
+                {{ anon() ? 'I tuoi dati non vengono mostrati' : 'I vicini di Trastevere vedranno il tuo nome' }}
+              </div>
+            </div>
+            <button type="button" class="anon-toggle" [class.on]="anon()" (click)="toggleAnon()">
+              <cv-icon name="lock" [size]="11" [color]="anon() ? 'var(--cv-red)' : 'var(--cv-text-mute)'"/>
+              {{ anon() ? 'ON' : 'OFF' }}
+            </button>
+          </div>
+        </section>
+      }
+    }
+  </div>
+
+  <div class="cta-bar">
+    @if (step() === 3) {
+      <div class="cta-note">
+        {{ isSec() ? 'I tuoi dati restano privati' : 'Visibile ai vicini di Trastevere' }}
+      </div>
+    }
+    <button class="cta" [class.is-enabled]="canContinue()" [disabled]="!canContinue()" (click)="next()">
+      {{ ctaLabel() }}
+    </button>
+  </div>
+</div>
