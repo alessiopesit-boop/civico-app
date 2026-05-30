@@ -168,3 +168,46 @@
   font-size: 11px;
   font-weight: 600;
 }
+
+.clear-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: calc(100% - 32px);
+  margin: 18px 16px 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(229, 72, 77, 0.25);
+  color: var(--cv-red);
+  font-family: var(--cv-font);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+}
+.empty-icon {
+  width: 56px; height: 56px;
+  border-radius: 28px;
+  background: var(--cv-surface);
+  border: 1px solid var(--cv-border);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+}
+.empty-title {
+  color: var(--cv-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+.empty-sub {
+  color: var(--cv-text-mute);
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 4px;
+  line-height: 1.45;
+}
