@@ -133,9 +133,11 @@
       <!-- Posizione -->
       <div class="section-eyebrow">Posizione</div>
       <div class="mini-map">
-        <cv-map-background [height]="138"/>
-        <cv-map-pin [pin]="{ id: report().id, cat: report().cat, xp: 0.5, yp: 0.5 }"
-                    [big]="true" [styleOverride]="'coda'"/>
+        <cv-leaflet-map [pins]="mapPins()"
+                        [center]="mapCenter()"
+                        [zoom]="16"
+                        [interactive]="false"
+                        [showYouAreHere]="false"/>
         <div class="map-chip">{{ report().where }} · 80m</div>
       </div>
 

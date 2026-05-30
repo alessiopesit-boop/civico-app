@@ -11,7 +11,7 @@ import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { CategoryBadgeComponent } from '../../shared/category-badge/category-badge.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
-import { MapBackgroundComponent } from '../../shared/map-background/map-background.component';
+import { LeafletMapComponent } from '../../shared/leaflet-map/leaflet-map.component';
 import { PhotoComponent } from '../../shared/photo/photo.component';
 
 @Component({
@@ -20,7 +20,7 @@ import { PhotoComponent } from '../../shared/photo/photo.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AvatarComponent, CategoryBadgeComponent, FormsModule,
-    IconBtnComponent, IconComponent, MapBackgroundComponent, PhotoComponent,
+    IconBtnComponent, IconComponent, LeafletMapComponent, PhotoComponent,
   ],
   templateUrl: './new-report.component.html',
   styleUrl: './new-report.component.scss',

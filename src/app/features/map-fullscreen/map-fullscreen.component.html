@@ -1,15 +1,6 @@
 <div class="screen">
   <div class="map-wrap">
-    @if (useGoogleMap()) {
-      <cv-google-map [pins]="data.pins()" [dimmedIds]="dimmedIds()" (pinClick)="openDetail($event)"/>
-    } @else {
-      <cv-map-background [height]="1000"/>
-      @for (p of data.pins(); track p.id) {
-        <cv-map-pin [pin]="p" [dim]="dimmedIds().has(p.id)" [big]="p.id === 1" (pinClick)="openDetail(p)"/>
-      }
-      <div class="cluster">+7</div>
-      <div class="you"></div>
-    }
+    <cv-leaflet-map [pins]="data.pins()" [dimmedIds]="dimmedIds()" (pinClick)="openDetail($event)"/>
   </div>
 
   <div class="top">
@@ -21,16 +12,6 @@
       <span>Cerca indirizzo o zona</span>
       <div class="sep"></div>
       <cv-icon name="filter" [size]="15" color="var(--cv-text)"/>
-    </div>
-  </div>
-
-  <div class="rail">
-    <cv-icon-btn><cv-icon name="layers" [size]="15" color="var(--cv-text)"/></cv-icon-btn>
-    <cv-icon-btn><cv-icon name="locate" [size]="15" color="var(--cv-text)"/></cv-icon-btn>
-    <div class="zoom">
-      <button>+</button>
-      <div class="zoom-sep"></div>
-      <button>−</button>
     </div>
   </div>
 

@@ -70,15 +70,7 @@
           <p class="sub">Trascina il pin sul punto esatto. Puoi pinnare ovunque, non solo dove sei.</p>
 
           <div class="map-box">
-            <cv-map-background [height]="340"/>
-            <div class="placed-pin" aria-hidden="true">
-              <div class="placed-circle" [style.background]="catMeta().color"
-                   [style.--ring-color]="catMeta().color + '22'">
-                <cv-icon [name]="catMeta().iconName" [size]="20" color="#0F1115"/>
-              </div>
-              <div class="placed-tail" [style.border-top-color]="catMeta().color"></div>
-              <div class="placed-shadow"></div>
-            </div>
+            <cv-leaflet-map [centerPin]="true" [showYouAreHere]="false"/>
             <div class="place-chip">
               <cv-icon name="pinSmall" [size]="14" [color]="catMeta().color"/>
               <div class="place-text">
