@@ -78,10 +78,26 @@
         }
       }
 
-      <button type="button" class="clear-all" (click)="clearAll()">
+      <button type="button" class="clear-all" (click)="askClear()">
         <cv-icon name="trash" [size]="14" color="var(--cv-red)"/>
         Elimina tutte le notifiche
       </button>
     }
   </div>
+
+  @if (confirmOpen()) {
+    <div class="modal-overlay" (click)="cancelClear()">
+      <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <button type="button" class="modal-x" (click)="cancelClear()" aria-label="Chiudi">
+          <cv-icon name="close" [size]="16" color="var(--cv-text-mute)"/>
+        </button>
+        <div class="modal-title">Eliminare tutte le notifiche?</div>
+        <div class="modal-sub">L'azione non si può annullare.</div>
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel" (click)="cancelClear()">Annulla</button>
+          <button type="button" class="modal-confirm" (click)="confirmClear()">Elimina tutte</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
