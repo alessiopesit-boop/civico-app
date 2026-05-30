@@ -83,6 +83,9 @@ export class NotificationsComponent {
   readonly settimana = computed(() => this.rows().filter(r => r.group === 'settimana'));
   readonly isEmpty = computed(() => this.rows().length === 0);
 
+  /** Modale di conferma per l'eliminazione di tutte le notifiche. */
+  readonly confirmOpen = signal<boolean>(false);
+
   setTab(k: Tab): void { this.tab.set(k); }
 
   back(): void { window.history.back(); }
@@ -93,8 +96,17 @@ export class NotificationsComponent {
     if (row.routerLink) void this.router.navigate(row.routerLink as readonly unknown[]);
   }
 
-  clearAll(): void {
+  askClear(): void {
+    this.confirmOpen.set(true);
+  }
+
+  cancelClear(): void {
+    this.confirmOpen.set(false);
+  }
+
+  confirmClear(): void {
     this.rows.set([]);
+    this.confirmOpen.set(false);
     this.toast.show('Notifiche eliminate');
   }
 }
