@@ -84,14 +84,9 @@
         </div>
       }
 
-      <button class="cta-confirm" [class.locked]="!isActive()" (click)="openConfirmSheet()">
-        @if (isActive()) {
-          <cv-icon name="hand" [size]="17" color="var(--cv-bg)"/>
-          Anche io l'ho visto
-        } @else {
-          <cv-icon name="lock" [size]="15" color="var(--cv-text-mute)"/>
-          Verifica numero per confermare
-        }
+      <button class="cta-confirm" (click)="openConfirmSheet()">
+        <cv-icon name="hand" [size]="17" color="var(--cv-bg)"/>
+        Anche io l'ho visto
       </button>
       <div class="cta-sub">Tocca per scegliere: visto / peggiorato / non c'è più</div>
 
