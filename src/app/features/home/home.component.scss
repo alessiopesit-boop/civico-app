@@ -9,6 +9,9 @@
   top: 0; left: 0; right: 0;
   overflow: hidden;
   background: var(--cv-bg-map);
+  // Crea uno stacking context: cosi' gli z-index interni di Leaflet (fino a
+  // ~1000) restano confinati qui sotto e non scavalcano header/sheet/FAB.
+  z-index: 0;
 }
 
 .you {
