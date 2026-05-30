@@ -310,6 +310,10 @@ Android / Google Play (TWA): non configurato. Possibile sviluppo futuro (richied
 5. Riusa i componenti shared (`cv-screen-header`, `cv-icon`, `cv-icon-btn`, ...) e i token `--cv-*`.
 6. **Aggiorna questo file** se la pagina introduce un nuovo concetto (categoria di pagina, dipendenza, pattern, servizio).
 
+## Licenza e titolarita'
+
+Il progetto e' **proprietario, tutti i diritti riservati** (vedi `LICENSE`, copyright Alessio Pes). Non e' open source: il codice e' pubblico solo per consultazione/esecuzione del servizio. `package.json` ha `"license": "UNLICENSED"` e `"private": true`. Tutto deve restare riconducibile al profilo personale **alessiopesit-boop** (identita' git del repo = email personale, mai quella di lavoro). Nota onesta sui limiti: la licenza protegge il **codice** (l'espressione), non l'**idea**; per tenere riservata l'idea servirebbe un repo privato (che pero' su free tier non e' compatibile con GitHub Pages).
+
 ## Note operative per l'assistente
 
 - Quando ti viene chiesto di "fare X" rispondi in italiano (il proprietario lavora in italiano).
