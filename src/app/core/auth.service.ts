@@ -23,7 +23,10 @@ export class AuthService {
 
   setUserType(t: UserType): void {
     this.userType.set(t);
-    if (t !== 'guest') this.authed.set(true);
+    // Anche l'ospite e' "passato dal login": deve poter entrare nell'app in
+    // sola lettura. Le azioni che richiedono partecipazione (segnalare,
+    // confermare) restano gate da userType === 'active', non da authed.
+    this.authed.set(true);
   }
 
   finishOnboarding(): void {
