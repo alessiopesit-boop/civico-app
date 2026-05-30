@@ -39,3 +39,7 @@ Per la mappa reale, metti una API key della Google Maps JavaScript API in `src/e
 Pubblicazione automatica su GitHub Pages a ogni Release. Il versioning e le release sono gestiti da [release-please](https://github.com/googleapis/release-please): si mergiano PR con [Conventional Commits](https://www.conventionalcommits.org/), il bot apre la Release PR, e al merge nascono tag, GitHub Release e deploy.
 
 Dettagli di sviluppo, convenzioni e flusso di lavoro completo: vedi [`CLAUDE.md`](./CLAUDE.md).
+
+## Licenza
+
+Proprietaria, **tutti i diritti riservati**. Copyright (c) 2026 Alessio Pes. Il codice e' visibile ma non e' open source: nessun uso, copia, modifica o distribuzione e' consentito senza autorizzazione scritta. Vedi [`LICENSE`](./LICENSE).

@@ -1,6 +1,9 @@
 {
   "name": "civico-app",
   "version": "0.1.0",
+  "description": "Civico: segnalazioni urbane dalla gente, per la gente.",
+  "author": "Alessio Pes",
+  "license": "UNLICENSED",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
