@@ -72,9 +72,6 @@ export class DetailComponent {
 
   readonly isFollowing = computed(() => !!this.report().followed);
 
-  readonly isActive = computed(() => this.auth.userType() === 'active');
-  readonly isGuest = computed(() => this.auth.userType() === 'guest');
-
   readonly confirmSheetOpen = signal<boolean>(false);
   readonly flagSheetOpen = signal<boolean>(false);
 
@@ -118,7 +115,6 @@ export class DetailComponent {
   }
 
   openConfirmSheet(): void {
-    if (!this.requireActive('confermare')) return;
     this.confirmSheetOpen.set(true);
   }
 
@@ -167,17 +163,5 @@ export class DetailComponent {
       offensiva: 'Inviata ai moderatori.',
     };
     this.toast.show(labels[kind]);
-  }
-
-  private requireActive(action: string): boolean {
-    if (this.isActive()) return true;
-    if (this.isGuest()) {
-      this.toast.show(`Accedi per ${action}`);
-      void this.router.navigate(['/login']);
-    } else {
-      this.toast.show(`Verifica numero per ${action}`);
-      void this.router.navigate(['/add-phone']);
-    }
-    return false;
   }
 }

@@ -15,7 +15,6 @@ import { DataService } from '../../core/data.service';
 import { GoogleMapsLoaderService } from '../../core/google-maps-loader.service';
 import { SettingsService } from '../../core/settings.service';
 import { ToastService } from '../../core/toast.service';
-import { APP_VERSION, BUILD_CONTEXT, BUILD_SHA } from '../../core/build-info';
 import type { FilterKey, Pin, SortKey } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
@@ -76,15 +75,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   readonly filters = FILTERS;
   readonly sortLabels = SORT_LABELS;
 
-  /** Versione mostrata in fondo al feed: "v0.1.0" in release, "v0.1.0 · dev · abc1234" in dev. */
-  readonly buildLabel =
-    BUILD_CONTEXT === 'release' ? `v${APP_VERSION}` : `v${APP_VERSION} · dev · ${BUILD_SHA}`;
   readonly sortOptionsKeys: SortKey[] = ['rilevanti', 'recenti', 'vicine', 'reazioni'];
 
-  readonly userTypeS = this.auth.userType;
-  readonly isGuest = computed(() => this.userTypeS() === 'guest');
-  readonly isBase = computed(() => this.userTypeS() === 'base');
-  readonly isActive = computed(() => this.userTypeS() === 'active');
   readonly identity = this.auth.identity;
 
   readonly containerH = signal<number>(this.computeContainerH());
@@ -227,14 +219,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   tapFab(): void {
-    if (this.requireActive('segnalare')) {
-      void this.router.navigate(['/new-report']);
-    }
-  }
-
-  tapAccountBanner(): void {
-    if (this.isGuest()) void this.router.navigate(['/login']);
-    else if (this.isBase()) void this.router.navigate(['/add-phone']);
+    void this.router.navigate(['/new-report']);
   }
 
   // ── Filters / sort ────────────────────────────────────────────────────
@@ -274,18 +259,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   // ── helpers ───────────────────────────────────────────────────────────
-  private requireActive(action: string): boolean {
-    if (this.isActive()) return true;
-    if (this.isGuest()) {
-      this.toast.show(`Accedi per ${action}`);
-      void this.router.navigate(['/login']);
-    } else {
-      this.toast.show(`Verifica numero per ${action}`);
-      void this.router.navigate(['/add-phone']);
-    }
-    return false;
-  }
-
   trackPin(_: number, p: Pin): number { return p.id; }
 
   filterDotColor(f: FilterKey): string {

@@ -31,7 +31,7 @@
           <cv-icon name="bell" [size]="17" color="var(--cv-text)"/>
         </cv-icon-btn>
         <button class="avatar-btn" (click)="goProfile()" aria-label="Profilo">
-          <cv-avatar [user]="isGuest() ? 'anon' : identity()" [size]="36"/>
+          <cv-avatar [user]="identity()" [size]="36"/>
         </button>
       </div>
     </div>
@@ -49,28 +49,6 @@
       </div>
     </div>
 
-    @if (isGuest() || isBase()) {
-      <button class="acct-banner" [class.is-base]="isBase()" (click)="tapAccountBanner()">
-        <div class="acct-icon">
-          @if (isGuest()) {
-            <cv-icon name="search" [size]="12" color="var(--cv-text-mute)"/>
-          } @else {
-            <cv-icon name="lock" [size]="12" color="var(--cv-amber)"/>
-          }
-        </div>
-        <div class="acct-text">
-          <div class="acct-title">
-            @if (isGuest()) { Stai esplorando come ospite }
-            @else { Verifica numero per partecipare }
-          </div>
-          <div class="acct-sub">
-            @if (isGuest()) { Accedi per segnalare o confermare }
-            @else { Diventa account attivo, è un OTP }
-          </div>
-        </div>
-        <cv-icon name="chevron" [size]="12" color="var(--cv-text-faint)"/>
-      </button>
-    }
   </div>
 
   <!-- Map controls + FAB -->
@@ -78,9 +56,6 @@
        [style.bottom.px]="sheetH() + 12"
        [class.dragging]="isDragging()"
        [class.hidden]="!showControls()">
-    <cv-icon-btn (btnClick)="goMap()">
-      <cv-icon name="layers" [size]="16" color="var(--cv-text)"/>
-    </cv-icon-btn>
     <cv-icon-btn>
       <cv-icon name="locate" [size]="16" color="var(--cv-text)"/>
     </cv-icon-btn>
@@ -90,13 +65,9 @@
           [style.bottom.px]="sheetH() + (showControls() ? 92 : 12)"
           [class.dragging]="isDragging()"
           [class.hidden]="!showFab()"
-          [class.locked]="!isActive()"
-          (click)="tapFab()">
-    @if (isActive()) {
-      <cv-icon name="plus" [size]="24" color="var(--cv-bg)"/>
-    } @else {
-      <cv-icon name="lock" [size]="20" color="var(--cv-text-mute)"/>
-    }
+          (click)="tapFab()"
+          aria-label="Nuova segnalazione">
+    <cv-icon name="plus" [size]="26" color="var(--cv-bg)"/>
   </button>
 
   <!-- Bottom sheet -->
@@ -170,7 +141,6 @@
       @if (data.visibleReports().length === 0) {
         <div class="empty">Nessuna segnalazione in questa categoria.</div>
       }
-      <p class="home-version" aria-label="Versione applicazione">{{ buildLabel }}</p>
       <div class="bottom-space"></div>
     </div>
   </section>
