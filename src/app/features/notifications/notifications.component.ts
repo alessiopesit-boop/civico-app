@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { DataService } from '../../core/data.service';
+import { ToastService } from '../../core/toast.service';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 
@@ -33,6 +34,7 @@ interface NotifRow {
 export class NotificationsComponent {
   private readonly router = inject(Router);
   private readonly data = inject(DataService);
+  private readonly toast = inject(ToastService);
 
   readonly tab = signal<Tab>('tutte');
 
@@ -42,7 +44,7 @@ export class NotificationsComponent {
     { k: 'zona',  label: 'Zona',  count:  8 },
   ];
 
-  readonly oggi: NotifRow[] = [
+  private readonly seed: NotifRow[] = [
     { iconName: 'hand', iconColor: 'var(--cv-amber)', bg: 'var(--cv-amber-soft)',
       prefix: 'Sofia R.', text: 'ha confermato la tua buca in Via Garibaldi',
       sub: 'Ora siete in 47 a confermare.', time: '15 min fa', unread: true, group: 'oggi',
@@ -56,9 +58,6 @@ export class NotificationsComponent {
       text: 'Nuovo livello sbloccato: Cittadino attivo',
       sub: 'Hai aperto 6 segnalazioni. Continua così.',
       time: '3 ore fa', unread: true, group: 'oggi', routerLink: ['/profile'] },
-  ];
-
-  readonly settimana: NotifRow[] = [
     { iconName: 'pothole', iconColor: 'var(--cv-amber)', bg: 'var(--cv-amber-soft)',
       prefix: 'Marco T.', text: 'ha segnalato una nuova buca vicino a te',
       sub: 'Viale dei Pini · ~120m da casa', time: 'ieri', unread: false,
@@ -78,6 +77,12 @@ export class NotificationsComponent {
       routerLink: ['/detail', 3] },
   ];
 
+  /** Lista corrente (svuotabile da "Elimina tutte"). */
+  readonly rows = signal<NotifRow[]>([...this.seed]);
+  readonly oggi = computed(() => this.rows().filter(r => r.group === 'oggi'));
+  readonly settimana = computed(() => this.rows().filter(r => r.group === 'settimana'));
+  readonly isEmpty = computed(() => this.rows().length === 0);
+
   setTab(k: Tab): void { this.tab.set(k); }
 
   back(): void { window.history.back(); }
@@ -86,5 +91,10 @@ export class NotificationsComponent {
 
   openRow(row: NotifRow): void {
     if (row.routerLink) void this.router.navigate(row.routerLink as readonly unknown[]);
+  }
+
+  clearAll(): void {
+    this.rows.set([]);
+    this.toast.show('Notifiche eliminate');
   }
 }

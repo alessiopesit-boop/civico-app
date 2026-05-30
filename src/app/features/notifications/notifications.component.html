@@ -25,45 +25,62 @@
   </div>
 
   <div class="list">
-    <div class="eyebrow">Oggi</div>
-    @for (row of oggi; track row.text) {
-      <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
-        @if (row.unread) { <span class="unread-dot"></span> }
-        <div class="row-icon" [style.background]="row.bg">
-          <cv-icon [name]="$any(row.iconName)" [size]="16" [color]="row.iconColor"/>
-        </div>
-        <div class="row-text">
-          <div class="row-title">
-            @if (row.prefix) { <b>{{ row.prefix }}</b> }
-            {{ row.text }}
-          </div>
-          <div class="row-sub">{{ row.sub }}</div>
-          <div class="row-meta">
-            <span class="time">{{ row.time }}</span>
-            @if (row.action) { <span class="action">{{ row.action }}</span> }
-          </div>
-        </div>
-      </button>
-    }
+    @if (isEmpty()) {
+      <div class="empty">
+        <div class="empty-icon"><cv-icon name="bell" [size]="22" color="var(--cv-text-faint)"/></div>
+        <div class="empty-title">Nessuna notifica</div>
+        <div class="empty-sub">Quando succede qualcosa nelle tue zone lo vedrai qui.</div>
+      </div>
+    } @else {
+      @if (oggi().length) {
+        <div class="eyebrow">Oggi</div>
+        @for (row of oggi(); track row.text) {
+          <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
+            @if (row.unread) { <span class="unread-dot"></span> }
+            <div class="row-icon" [style.background]="row.bg">
+              <cv-icon [name]="$any(row.iconName)" [size]="16" [color]="row.iconColor"/>
+            </div>
+            <div class="row-text">
+              <div class="row-title">
+                @if (row.prefix) { <b>{{ row.prefix }}</b> }
+                {{ row.text }}
+              </div>
+              <div class="row-sub">{{ row.sub }}</div>
+              <div class="row-meta">
+                <span class="time">{{ row.time }}</span>
+                @if (row.action) { <span class="action">{{ row.action }}</span> }
+              </div>
+            </div>
+          </button>
+        }
+      }
 
-    <div class="eyebrow">Questa settimana</div>
-    @for (row of settimana; track row.text) {
-      <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
-        @if (row.unread) { <span class="unread-dot"></span> }
-        <div class="row-icon" [style.background]="row.bg">
-          <cv-icon [name]="$any(row.iconName)" [size]="16" [color]="row.iconColor"/>
-        </div>
-        <div class="row-text">
-          <div class="row-title">
-            @if (row.prefix) { <b>{{ row.prefix }}</b> }
-            {{ row.text }}
-          </div>
-          <div class="row-sub">{{ row.sub }}</div>
-          <div class="row-meta">
-            <span class="time">{{ row.time }}</span>
-            @if (row.action) { <span class="action">{{ row.action }}</span> }
-          </div>
-        </div>
+      @if (settimana().length) {
+        <div class="eyebrow">Questa settimana</div>
+        @for (row of settimana(); track row.text) {
+          <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
+            @if (row.unread) { <span class="unread-dot"></span> }
+            <div class="row-icon" [style.background]="row.bg">
+              <cv-icon [name]="$any(row.iconName)" [size]="16" [color]="row.iconColor"/>
+            </div>
+            <div class="row-text">
+              <div class="row-title">
+                @if (row.prefix) { <b>{{ row.prefix }}</b> }
+                {{ row.text }}
+              </div>
+              <div class="row-sub">{{ row.sub }}</div>
+              <div class="row-meta">
+                <span class="time">{{ row.time }}</span>
+                @if (row.action) { <span class="action">{{ row.action }}</span> }
+              </div>
+            </div>
+          </button>
+        }
+      }
+
+      <button type="button" class="clear-all" (click)="clearAll()">
+        <cv-icon name="trash" [size]="14" color="var(--cv-red)"/>
+        Elimina tutte le notifiche
       </button>
     }
   </div>
