@@ -132,7 +132,11 @@ public/
 
 ### Build info (dev vs release)
 
-`core/build-info.ts` espone `APP_VERSION` (da `package.json`), `BUILD_CONTEXT` (`'dev'` / `'release'`), `BUILD_SHA` (hash short, solo in dev). E' mostrato nella riga versione in fondo a **Impostazioni**: `v0.1.0` in release, `v0.1.0 · dev · abc1234` in dev.
+`core/build-info.ts` espone `APP_VERSION` (da `package.json`), `BUILD_CONTEXT` (`'dev'` / `'release'`), `BUILD_SHA` (hash short, solo in dev). La versione e' mostrata in tre punti, tutti con la stessa logica (`v0.1.0` in release, `v0.1.0 · dev · abc1234` in dev):
+
+- in fondo al feed della **Home** (`HomeComponent.buildLabel`, classe `.home-version`);
+- nella riga versione in fondo a **Impostazioni** (`SettingsComponent.buildLabel`);
+- nel **titolo della scheda** del browser: in dev `app.ts` prefissa `[dev] ` davanti a "Civico" (in release resta "Civico").
 
 Meccanismo (identico nello spirito a come si gestisce la versione altrove):
 
