@@ -1,22 +1,9 @@
 <div class="home">
   <!-- MAP -->
   <div class="map-wrap" [style.height.px]="containerH()">
-    @if (useGoogleMap()) {
-      <cv-google-map [pins]="data.pins()"
-                     [dimmedIds]="dimmedPinIds()"
-                     (pinClick)="goDetail($event.id)"/>
-    } @else {
-      <cv-map-background [height]="containerH()"/>
-      @for (p of data.pins(); track p.id) {
-        <cv-map-pin [pin]="p"
-                    [dim]="dimmedPinIds().has(p.id)"
-                    [big]="p.id === 1"
-                    (pinClick)="goDetail(p.id)"/>
-      }
-      <div class="you" aria-hidden="true">
-        <div class="you-pulse"></div>
-      </div>
-    }
+    <cv-leaflet-map [pins]="data.pins()"
+                    [dimmedIds]="dimmedPinIds()"
+                    (pinClick)="goDetail($event.id)"/>
   </div>
 
   <!-- HEADER -->

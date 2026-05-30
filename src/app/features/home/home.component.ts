@@ -4,7 +4,6 @@ import {
   computed,
   HostListener,
   OnDestroy,
-  OnInit,
   effect,
   inject,
   signal,
@@ -12,17 +11,14 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
-import { GoogleMapsLoaderService } from '../../core/google-maps-loader.service';
 import { SettingsService } from '../../core/settings.service';
 import { ToastService } from '../../core/toast.service';
 import type { FilterKey, Pin, SortKey } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
-import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
+import { LeafletMapComponent } from '../../shared/leaflet-map/leaflet-map.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { LocationChipComponent } from '../../shared/location-chip/location-chip.component';
-import { MapBackgroundComponent } from '../../shared/map-background/map-background.component';
-import { MapPinComponent } from '../../shared/map-pin/map-pin.component';
 import { PolsoCardComponent } from '../../shared/polso-card/polso-card.component';
 import { ReportCardComponent } from '../../shared/report-card/report-card.component';
 import { WordmarkComponent } from '../../shared/wordmark/wordmark.component';
@@ -50,12 +46,10 @@ const SORT_LABELS: Record<SortKey, string> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AvatarComponent,
-    GoogleMapComponent,
+    LeafletMapComponent,
     IconBtnComponent,
     IconComponent,
     LocationChipComponent,
-    MapBackgroundComponent,
-    MapPinComponent,
     PolsoCardComponent,
     ReportCardComponent,
     WordmarkComponent,
@@ -64,13 +58,12 @@ const SORT_LABELS: Record<SortKey, string> = {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
   private readonly settings = inject(SettingsService);
   readonly data = inject(DataService);
-  private readonly mapsLoader = inject(GoogleMapsLoaderService);
 
   readonly filters = FILTERS;
   readonly sortLabels = SORT_LABELS;
@@ -117,14 +110,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     return new Set(all.filter(id => !visible.has(id)));
   });
 
-  readonly mapsReady = this.mapsLoader.state;
-  readonly useGoogleMap = computed(() => this.mapsLoader.state() === 'ready');
-
   // ── Lifecycle ─────────────────────────────────────────────────────────
-  ngOnInit(): void {
-    void this.mapsLoader.load();
-  }
-
   ngOnDestroy(): void {
     document.removeEventListener('pointermove', this.onDragMove);
     document.removeEventListener('pointerup', this.onDragEnd);

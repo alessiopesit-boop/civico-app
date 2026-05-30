@@ -6,13 +6,12 @@ import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
 import { ToastService } from '../../core/toast.service';
 import { reportLifecycle, timeVerb } from '../../core/utils';
-import type { Report, UserKey } from '../../core/models';
+import type { Pin, Report, UserKey } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { CategoryBadgeComponent } from '../../shared/category-badge/category-badge.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
-import { MapBackgroundComponent } from '../../shared/map-background/map-background.component';
-import { MapPinComponent } from '../../shared/map-pin/map-pin.component';
+import { LeafletMapComponent } from '../../shared/leaflet-map/leaflet-map.component';
 import { PhotoComponent } from '../../shared/photo/photo.component';
 
 interface TimelineStep {
@@ -30,7 +29,7 @@ interface TimelineStep {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AvatarComponent, CategoryBadgeComponent, IconBtnComponent, IconComponent,
-    MapBackgroundComponent, MapPinComponent, PhotoComponent,
+    LeafletMapComponent, PhotoComponent,
   ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.scss',
@@ -53,6 +52,15 @@ export class DetailComponent {
     const list = this.data.reports();
     return list.find(r => r.id === idNum) ?? list[0];
   });
+
+  // Mini-mappa: il pin corrispondente (per coordinate) o un fallback su Roma.
+  readonly mapPin = computed<Pin>(() => {
+    const r = this.report();
+    const found = this.data.pins().find(p => p.id === r.id);
+    return found ?? { id: r.id, cat: r.cat, xp: 0.5, yp: 0.5, lat: 41.8893, lng: 12.4677 };
+  });
+  readonly mapPins = computed<Pin[]>(() => [this.mapPin()]);
+  readonly mapCenter = computed(() => ({ lat: this.mapPin().lat!, lng: this.mapPin().lng! }));
 
   readonly cat = computed(() => CATS[this.report().cat]);
   readonly isSec = computed(() => this.cat().group === 'sicurezza');

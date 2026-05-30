@@ -34,7 +34,7 @@ Errore tipico da evitare: aprire la PR di codice e "poi aggiorno la doc". La doc
 
 Civico e' una webapp civica mobile-first (dark theme) per segnalazioni urbane: i cittadini segnalano disservizi (buche, alberi pericolanti, lampioni rotti, rifiuti) e fatti di sicurezza (furti auto, furti in casa, vandalismi) della propria zona, e si confermano a vicenda le segnalazioni. Il modello mentale: Citizen.com per l'estetica della mappa, FixMyStreet per la logica civica, ma con tono costruttivo e collettivo ("dalla gente, per la gente"), non dipendente dal Comune.
 
-Stato attuale: **prototipo navigabile 100% locale**, nessun backend. Tutta la persistenza (auth simulata, preferenze, zone, stato segnalazioni della sessione) vive in `localStorage`. La mappa usa **Google Maps** quando e' configurata una API key, altrimenti ripiega su una mappa stilizzata SVG locale.
+Stato attuale: **prototipo navigabile 100% locale**, nessun backend. Tutta la persistenza (auth simulata, preferenze, zone, stato segnalazioni della sessione) vive in `localStorage`. La mappa e' una vera mappa **Leaflet + OpenStreetMap** (tile scuri, nessuna API key).
 
 Flusso utente: Onboarding (primo accesso) -> Login (ospite / base / attivo) -> Home (mappa + bottom sheet trascinabile col feed) -> Dettaglio segnalazione, Nuova segnalazione (3 step), Mappa fullscreen, Profilo, Notifiche, Impostazioni, Info & policy, Storico, gestione Zone (aggiungi / gestisci / verifica GPS).
 
@@ -47,7 +47,7 @@ Tre livelli di account (simulati): **ospite** (sola lettura), **base** (email/Go
 - **Parametri di route via input signal**: `provideRouter(routes, withComponentInputBinding())`, e nei componenti si legge il path param con `input.required<string>()` (es. `DetailComponent.id`, `VerifyZoneComponent.id`). Niente `ActivatedRoute.snapshot` se non per i query param (vedi `InfoComponent`, che legge `?tab=`).
 - **Routing**: `provideRouter` con path location standard (no `#` nelle URL). Lazy `loadComponent` per ogni schermata. Guard in `core/guards.ts`. Su GitHub Pages il refresh diretto su una route deep funziona via `public/404.html`: salva il path in `sessionStorage` (chiave `civico-redirect`) e redirige a `/civico-app/`; lo script in `src/index.html` lo ripristina via `history.replaceState` prima del bootstrap.
 - **Styling**: **SCSS**. Token di design globali in `src/styles/_tokens.scss` (palette, font, spacing, custom properties `--cv-*`), piu' `_animations.scss` e `_mixins.scss`, tutti importati da `src/styles.scss`. Ogni componente ha il suo SCSS scoped (inline `styles: []` per i piccoli, file `.component.scss` per i grandi). Font **Manrope** da Google Fonts. Niente librerie UI esterne.
-- **Mappa**: `@angular/google-maps` + `@types/google.maps`. La JS API di Google Maps viene caricata a runtime da `GoogleMapsLoaderService` leggendo la key da `src/environments/environment.ts`. Senza key, l'app usa il fallback SVG (`MapBackgroundComponent` + `MapPinComponent`). Vedi sezione "Google Maps".
+- **Mappa**: **Leaflet** + tile **OpenStreetMap** (CartoDB dark, nessuna API key, nessun billing). Componente riutilizzabile `cv-leaflet-map` (`shared/leaflet-map/`) usato in home, mappa fullscreen, mini-mappa del dettaglio e scelta posizione della nuova segnalazione. I marker sono `divIcon` HTML colorati per categoria. Il CSS di Leaflet e' caricato via `angular.json` (`node_modules/leaflet/dist/leaflet.css`). Vedi sezione "Mappa". I file Google Maps (`google-map/`, `google-maps-loader.service.ts`) restano nel repo come opzione futura ma **non sono usati**.
 - **Build/test**: builder `@angular/build` (esbuild + vite dev server). Vitest e' presente come devDep ma non ci sono spec; `tsconfig.spec.json` resta placeholder.
 - **Niente lint configurato**. Prettier presente come devDep (`.prettierrc`), usato come default editor, non invocato da CI.
 - **Backend**: nessuno. App 100% locale. Se in futuro arriva auth/sync reale (es. Firebase), va documentata una sezione dedicata qui e in README, e va aggiornata la "Regola d'oro".
@@ -88,8 +88,9 @@ src/
       avatar/ wordmark/ location-chip/ icon-btn/ category-badge/ photo/
       app-shell/             # cornice (desktop fake-frame / mobile fullscreen) + router-outlet + toast
       toast/ screen-header/
-      map-background/ map-pin/  # fallback mappa SVG
-      google-map/            # cv-google-map (wrapper Google Maps JS API + stile dark)
+      leaflet-map/           # cv-leaflet-map (mappa vera Leaflet + OSM, marker per categoria)
+      map-background/ map-pin/  # vecchia mappa SVG (solo onboarding/verifica-zona)
+      google-map/            # cv-google-map (Google Maps, NON usato: opzione futura)
       report-card/ polso-card/
     features/                # una cartella per schermata: <nome>/<nome>.component.{ts,html,scss}
       onboarding/ login/ add-phone/
@@ -127,7 +128,7 @@ public/
 - `DataService` (`core/data.service.ts`): cuore dei dati. Signal `reports`, `pins`, `notifications`; `filter`/`sort` persistiti; `computed` `visibleReports`, `visiblePinIds`, `activeCount`, `unreadNotificationsCount`. Gestione zone (`zones`, `activeZoneId`, `activeZone`, `addZone`/`removeZone`/`updateZone`/`verifyZone`/`setZoneRole`). Mutazioni segnalazioni: `confirm`, `toggleFollow`, `flag`, `addReport`, `markAllNotificationsRead`.
 - `SettingsService` (`core/settings.service.ts`): preferenze persistite (`pinStyle`, `showPhoto`, `privacyAnonDefault`, `notificationsPush`, `polsoDismissedAt`).
 - `ToastService` (`core/toast.service.ts`): toast transitorio (`show(message, kind, durationMs)`), un signal `current` letto da `cv-toast`.
-- `GoogleMapsLoaderService` (`core/google-maps-loader.service.ts`): inietta lo script della JS API di Google Maps a runtime usando `environment.googleMaps.apiKey`; signal `state` (`idle | loading | ready | disabled | error`). `disabled` quando la key e' vuota: la UI usa allora il fallback SVG.
+- `GoogleMapsLoaderService` (`core/google-maps-loader.service.ts`): **non usato** dalla UI (la mappa e' Leaflet). Resta come scaffolding per un eventuale ritorno a Google Maps.
 - Guard (`core/guards.ts`): `onboardingGuard` (richiede onboarded + authed, applicata alle schermate dell'app), `onboardingScreenGuard` e `loginScreenGuard` (saltano le rispettive schermate se gia' superate). Da ricordare quando aggiungi una route.
 
 ### Build info (dev vs release)
@@ -146,16 +147,18 @@ Meccanismo (identico nello spirito a come si gestisce la versione altrove):
 
 Se modifichi questa logica: `build-info.prod.ts` deve esistere e avere la stessa shape esportata, altrimenti il build di produzione fallisce. Serve `resolveJsonModule: true` in `tsconfig.json` per importare `version` da `package.json`.
 
-## Google Maps
+## Mappa (Leaflet + OpenStreetMap)
 
-La mappa reale usa la JS API di Google Maps; senza key l'app funziona lo stesso con la mappa stilizzata SVG.
+La mappa e' vera, pannabile e zoomabile, **senza API key ne' billing**.
 
-- La key vive in `src/environments/environment.ts` (production) e `environment.development.ts` (dev, lasciata **vuota** apposta cosi' in locale si usa il fallback SVG e non si consuma quota). `angular.json` fa `fileReplacements` di `environment.ts` con `environment.development.ts` in configuration `development`.
-- `GoogleMapsLoaderService.load()` inietta lo script `maps.googleapis.com/maps/api/js` con la key e la libreria `marker`. Se la key e' vuota, ritorna subito `disabled`.
-- I componenti che mostrano mappe (`HomeComponent`, `MapFullscreenComponent`, e i mini-map di dettaglio/nuova segnalazione) controllano lo stato del loader: se `ready` montano `cv-google-map`, altrimenti `cv-map-background` + `cv-map-pin`.
-- I `Pin` (`core/data.ts`) hanno sia `xp`/`yp` (percentuali, per il fallback SVG) sia `lat`/`lng` (derivate, centrate su Trastevere/Roma) per i marker Google.
-- **Restringi sempre la key** (Cloud Console -> Credentials -> HTTP referrers): `localhost:4200/*` e `alessiopesit-boop.github.io/*`. La key di una JS API e' pubblica per natura (gira nel browser), la restrizione referrer e' la vera protezione contro l'abuso di quota.
-- Lo stile dark della mappa e' in `shared/google-map/google-map-dark-style.ts`.
+- Componente `cv-leaflet-map` (`shared/leaflet-map/leaflet-map.component.ts`). Input: `pins`, `center`, `zoom`, `dimmedIds`, `interactive` (default true), `showYouAreHere`, `centerPin` (pin fisso al centro per la scelta posizione). Output: `pinClick`.
+- Tile: CartoDB **dark_all** su OpenStreetMap (`https://{s}.basemaps.cartocdn.com/dark_all/...`), coerenti col tema scuro. Attribuzione OSM/CARTO obbligatoria (gia' inclusa, stilizzata discreta).
+- Marker: `L.divIcon` con HTML, cerchio colorato per categoria + glifo macro (cono/scudo/check). Niente immagini PNG (cosi' nessun problema di asset col bundler). I `dimmedIds` abbassano l'opacita' dei pin fuori filtro.
+- Zoom: nessun controllo `+/-` a schermo (si usa pinch/scroll/doppio tap), per non sovrapporsi alle barre.
+- Le coordinate vengono da `Pin.lat`/`Pin.lng` (`core/data.ts`, derivate intorno a Trastevere/Roma). `xp`/`yp` restano sui Pin ma servono solo alla vecchia mappa SVG (non piu' usata).
+- Il CSS di Leaflet e' in `angular.json` (`node_modules/leaflet/dist/leaflet.css`), non importarlo altrove.
+- Usata in: `HomeComponent`, `MapFullscreenComponent`, mini-mappa di `DetailComponent`, step posizione di `NewReportComponent`.
+- I componenti SVG (`map-background`, `map-pin`) e Google (`google-map`, `google-maps-loader.service`) restano nel repo: SVG ancora usato in onboarding/verifica-zona (decorativo), Google come opzione futura non attiva.
 
 ## Comandi
 

@@ -3,13 +3,10 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { CATS } from '../../core/data';
 import { DataService } from '../../core/data.service';
-import { GoogleMapsLoaderService } from '../../core/google-maps-loader.service';
 import type { CategoryGroup, Pin } from '../../core/models';
-import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
+import { LeafletMapComponent } from '../../shared/leaflet-map/leaflet-map.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
-import { MapBackgroundComponent } from '../../shared/map-background/map-background.component';
-import { MapPinComponent } from '../../shared/map-pin/map-pin.component';
 
 type FilterFlags = Record<CategoryGroup, boolean>;
 
@@ -17,7 +14,7 @@ type FilterFlags = Record<CategoryGroup, boolean>;
   selector: 'cv-map-fullscreen',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [GoogleMapComponent, IconBtnComponent, IconComponent, MapBackgroundComponent, MapPinComponent],
+  imports: [LeafletMapComponent, IconBtnComponent, IconComponent],
   templateUrl: './map-fullscreen.component.html',
   styleUrl: './map-fullscreen.component.scss',
 })
@@ -25,11 +22,8 @@ export class MapFullscreenComponent {
   private readonly location = inject(Location);
   private readonly router = inject(Router);
   readonly data = inject(DataService);
-  private readonly maps = inject(GoogleMapsLoaderService);
 
   readonly filters = signal<FilterFlags>({ disservizi: true, sicurezza: true, risolto: false });
-
-  readonly useGoogleMap = computed(() => this.maps.state() === 'ready');
 
   readonly visiblePins = computed<Pin[]>(() =>
     this.data.pins().filter(p => this.matches(p)),
@@ -50,10 +44,6 @@ export class MapFullscreenComponent {
 
   toggleFilter(k: CategoryGroup): void {
     this.filters.update(f => ({ ...f, [k]: !f[k] }));
-  }
-
-  ngOnInit(): void {
-    void this.maps.load();
   }
 
   private matches(p: Pin): boolean {
