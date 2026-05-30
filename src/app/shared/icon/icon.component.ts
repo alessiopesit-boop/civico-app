@@ -15,14 +15,15 @@ export class IconComponent {
   readonly name = input.required<IconName>();
   readonly size = input<number>(14);
   readonly color = input<string>('#0F1115');
-  readonly dir = input<IconDir>('right');
+  readonly dir = input<IconDir | undefined>(undefined);
   readonly filled = input<boolean>(false);
 
   readonly rotation = computed(() => {
-    const dir = this.dir();
     const n = this.name();
-    if (n === 'chevron') return { right: 0, down: 90, left: 180, up: 270 }[dir];
-    if (n === 'arrow') return { left: 0, right: 180, up: 90, down: 270 }[dir];
+    const dir = this.dir();
+    // Default per-icona: la freccia "indietro" punta a sinistra, il chevron a destra.
+    if (n === 'chevron') return { right: 0, down: 90, left: 180, up: 270 }[dir ?? 'right'];
+    if (n === 'arrow') return { left: 0, right: 180, up: 90, down: 270 }[dir ?? 'left'];
     return 0;
   });
 
