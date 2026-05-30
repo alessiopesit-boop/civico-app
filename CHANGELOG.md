@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/alessiopesit-boop/civico-app/compare/v0.1.0...v0.2.0) (2026-05-30)
+
+
+### Features
+
+* **ui:** mostra la versione in home e marca [dev] nel titolo ([#2](https://github.com/alessiopesit-boop/civico-app/issues/2)) ([18433ef](https://github.com/alessiopesit-boop/civico-app/commit/18433ef39480c67dd5c1beda2fa625f692e83d57))
+
 ## 0.1.0 (2026-05-30)
 
 
