@@ -1,20 +1,55 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { CATS, PINS, SEED_NOTIFICATIONS, SEED_REPORTS, SEED_ZONES } from './data';
 import { persistedSignal } from './persisted-signal';
-import { sortReports } from './utils';
-import type { CategoryKey, FilterKey, Notification, Pin, Report, SortKey, Zone, ZoneRole } from './models';
+import { relativeTime, sortReports } from './utils';
+import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
+import { ProfileService } from './profile.service';
+import type { CategoryKey, FilterKey, Notification, PhotoKind, Pin, Report, SortKey, Zone, ZoneRole } from './models';
+
+interface ReportRow {
+  id: number;
+  cat: string;
+  title: string;
+  note: string | null;
+  where_label: string | null;
+  lat: number | null;
+  lng: number | null;
+  photo: string | null;
+  anon: boolean;
+  status: string;
+  created_at: string;
+  author_label: string | null;
+  confirms: number;
+  recent6h: number;
+  resolution_votes: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
-  // Reports are kept as a writable signal so we can mutate (add confirms, votes, follow, flag).
-  readonly reports = signal<Report[]>([...SEED_REPORTS]);
+  private readonly sb = inject(SupabaseService);
+  private readonly auth = inject(AuthService);
+  private readonly profile = inject(ProfileService);
 
-  // Map pins are mostly static layout for the prototype.
-  readonly pins = signal<Pin[]>([...PINS]);
+  // Segnalazioni: dal DB Supabase se configurato, altrimenti seed locale.
+  readonly reports = signal<Report[]>(this.sb.enabled ? [] : [...SEED_REPORTS]);
 
-  // Notifications (writable so we can mark-as-read).
+  // Stati personali (per dispositivo): seguite e segnalate-come-falsa.
+  private readonly followedIds = persistedSignal<number[]>('civico.followed', []);
+  private readonly flaggedIds = persistedSignal<number[]>('civico.flagged', []);
+  // Reazioni gia' date su questo dispositivo (evita doppi conteggi ottimistici).
+  private readonly confirmedKeys = persistedSignal<string[]>('civico.confirmed', []);
+
+  // Pin della mappa: derivati dalle segnalazioni con coordinate reali. Se siamo
+  // in modalita' locale (seed senza coordinate) si usa il layout statico PINS.
+  readonly pins = computed<Pin[]>(() => {
+    const withCoords = this.reports().filter(r => r.lat != null && r.lng != null);
+    if (!withCoords.length) return [...PINS];
+    return withCoords.map(r => ({ id: r.id, cat: r.cat, xp: 0, yp: 0, lat: r.lat!, lng: r.lng! }));
+  });
+
+  // Notifiche (ancora seed locale per ora).
   readonly notifications = signal<Notification[]>([...SEED_NOTIFICATIONS]);
-
   readonly unreadNotificationsCount = computed(
     () => this.notifications().filter(n => n.unread).length,
   );
@@ -39,7 +74,7 @@ export class DataService {
     return this.reports().filter(r => r.cat !== 'risolto' && this.matchesFilter(r, f)).length;
   });
 
-  // ── Zones ───────────────────────────────────────────────────────────────
+  // ── Zones (ancora locali) ────────────────────────────────────────────────
   readonly zones = persistedSignal<Zone[]>('civico.zones', SEED_ZONES);
   readonly activeZoneId = persistedSignal<string>('civico.activeZone', SEED_ZONES[0].id);
   readonly activeZone = computed(() => {
@@ -47,39 +82,158 @@ export class DataService {
     return z.find(zone => zone.id === this.activeZoneId()) ?? z[0];
   });
 
+  // Id ottimistici (negativi) per le segnalazioni appena create, finche' il DB
+  // non restituisce l'id reale.
+  private optimisticSeq = -1;
+
+  constructor() {
+    if (this.sb.enabled) {
+      // Carica all'avvio e ricarica quando cambia l'utente (login/logout).
+      effect(() => {
+        this.auth.user(); // dipendenza: ricarica al cambio sessione
+        void this.loadReports();
+      });
+    }
+  }
+
+  /** Carica l'elenco condiviso dalla vista pubblica reports_public. */
+  async loadReports(): Promise<void> {
+    const client = this.sb.client;
+    if (!client) return;
+    try {
+      const { data } = await client
+        .from('reports_public')
+        .select('*')
+        .order('created_at', { ascending: false });
+      const followed = new Set(this.followedIds());
+      const flagged = new Set(this.flaggedIds());
+      const rows = (data ?? []) as ReportRow[];
+      this.reports.set(rows.map(row => this.mapRow(row, followed, flagged)));
+    } catch {
+      // Errore di rete: lascia l'elenco com'e' (non svuotare la UI).
+    }
+  }
+
+  private mapRow(row: ReportRow, followed: Set<number>, flagged: Set<number>): Report {
+    return {
+      id: row.id,
+      cat: row.cat as CategoryKey,
+      title: row.title,
+      where: row.where_label ?? '',
+      time: relativeTime(row.created_at),
+      confirms: row.confirms,
+      recent6h: row.recent6h,
+      resolutionVotes: row.resolution_votes,
+      photo: (row.photo ?? 'asphalt') as PhotoKind,
+      by: 'anon',
+      authorLabel: row.author_label,
+      anon: row.anon,
+      lat: row.lat ?? undefined,
+      lng: row.lng ?? undefined,
+      note: row.note ?? undefined,
+      createdAt: row.created_at,
+      followed: followed.has(row.id),
+      flagged: flagged.has(row.id),
+    };
+  }
+
   // ── Mutations ──────────────────────────────────────────────────────────
   getById(id: number): Report | undefined {
     return this.reports().find(r => r.id === id);
   }
 
   confirm(id: number, kind: 'visto' | 'peggiorata' | 'risolta'): void {
+    const key = `${id}:${kind}`;
+    if (this.confirmedKeys().includes(key)) return; // gia' votato su questo device
+    this.confirmedKeys.update(l => [...l, key]);
+
+    // Aggiornamento ottimistico locale.
     this.reports.update(list => list.map(r => {
       if (r.id !== id) return r;
-      if (kind === 'visto') return { ...r, confirms: r.confirms + 1, recent6h: r.recent6h + 1 };
-      if (kind === 'peggiorata') return { ...r, confirms: r.confirms + 1, recent6h: r.recent6h + 1 };
       if (kind === 'risolta') return { ...r, resolutionVotes: r.resolutionVotes + 1 };
-      return r;
+      return { ...r, confirms: r.confirms + 1, recent6h: r.recent6h + 1 };
     }));
+
+    // Scrittura su DB (il vincolo univoco protegge dai doppioni; ignoriamo errori).
+    const client = this.sb.client;
+    const userId = this.auth.user()?.id;
+    if (client && userId && id > 0) {
+      void client.from('confirmations').insert({ report_id: id, user_id: userId, kind });
+    }
   }
 
   toggleFollow(id: number): void {
-    this.reports.update(list => list.map(r => r.id === id ? { ...r, followed: !r.followed } : r));
+    const isFollowed = this.followedIds().includes(id);
+    this.followedIds.update(l => isFollowed ? l.filter(x => x !== id) : [...l, id]);
+    this.reports.update(list => list.map(r => r.id === id ? { ...r, followed: !isFollowed } : r));
   }
 
   flag(id: number): void {
+    if (!this.flaggedIds().includes(id)) this.flaggedIds.update(l => [...l, id]);
     this.reports.update(list => list.map(r => r.id === id ? { ...r, flagged: true } : r));
   }
 
-  addReport(partial: Omit<Report, 'id' | 'confirms' | 'recent6h' | 'resolutionVotes'>): Report {
-    const next: Report = {
-      id: Math.max(0, ...this.reports().map(r => r.id)) + 1,
+  /** Crea una nuova segnalazione (ottimistica + scrittura su Supabase). */
+  addReport(input: {
+    cat: CategoryKey;
+    title: string;
+    note?: string;
+    where: string;
+    lat?: number;
+    lng?: number;
+    photo: PhotoKind;
+    anon: boolean;
+  }): void {
+    const authorLabel = input.anon ? null : this.profile.displayName();
+    const optimistic: Report = {
+      id: this.optimisticSeq--,
+      cat: input.cat,
+      title: input.title,
+      where: input.where,
+      time: 'ora',
       confirms: 0,
       recent6h: 0,
       resolutionVotes: 0,
-      ...partial,
+      photo: input.photo,
+      by: 'anon',
+      authorLabel,
+      anon: input.anon,
+      lat: input.lat,
+      lng: input.lng,
+      note: input.note,
+      createdAt: new Date().toISOString(),
     };
-    this.reports.update(list => [next, ...list]);
-    return next;
+    this.reports.update(list => [optimistic, ...list]);
+
+    const client = this.sb.client;
+    const userId = this.auth.user()?.id;
+    if (!client || !userId) return;
+
+    void (async () => {
+      const { data } = await client
+        .from('reports')
+        .insert({
+          author_id: userId,
+          author_label: authorLabel,
+          cat: input.cat,
+          title: input.title,
+          note: input.note ?? null,
+          where_label: input.where,
+          lat: input.lat ?? null,
+          lng: input.lng ?? null,
+          photo: input.photo,
+          anon: input.anon,
+          status: 'attiva',
+        })
+        .select('id, created_at')
+        .single();
+      if (data) {
+        // Sostituisce l'id ottimistico con quello reale del DB.
+        this.reports.update(list => list.map(r =>
+          r.id === optimistic.id ? { ...r, id: data.id as number, createdAt: data.created_at as string } : r,
+        ));
+      }
+    })();
   }
 
   markAllNotificationsRead(): void {

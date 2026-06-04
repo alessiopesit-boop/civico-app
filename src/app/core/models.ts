@@ -44,7 +44,15 @@ export interface Report {
   resolutionVotes: number;
   photo: PhotoKind;
   by: UserKey;
-  // user-side flags
+  // identita' reale (segnalazioni da Supabase): etichetta autore gia' resa
+  // "Nome C." (null/anon se anonima) e coordinate reali per la mappa.
+  authorLabel?: string | null;
+  anon?: boolean;
+  lat?: number;
+  lng?: number;
+  note?: string;
+  createdAt?: string;
+  // user-side flags (locali per dispositivo)
   followed?: boolean;
   flagged?: boolean;
 }

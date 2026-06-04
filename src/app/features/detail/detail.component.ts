@@ -6,7 +6,7 @@ import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
 import { ToastService } from '../../core/toast.service';
 import { reportLifecycle, timeVerb } from '../../core/utils';
-import type { Pin, Report, UserKey } from '../../core/models';
+import type { Pin, Report, UserDef, UserKey } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { CategoryBadgeComponent } from '../../shared/category-badge/category-badge.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
@@ -64,7 +64,16 @@ export class DetailComponent {
 
   readonly cat = computed(() => CATS[this.report().cat]);
   readonly isSec = computed(() => this.cat().group === 'sicurezza');
-  readonly author = computed(() => USERS[this.report().by]);
+  readonly author = computed<UserDef>(() => {
+    const r = this.report();
+    if (r.authorLabel) {
+      const parts = r.authorLabel.trim().split(/\s+/);
+      const initials = ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase();
+      return { initials: initials || '··', name: r.authorLabel, hue: this.hueFrom(r.authorLabel) };
+    }
+    if (r.anon) return USERS['anon'];
+    return USERS[r.by] ?? USERS['anon'];
+  });
   readonly timeVerbStr = computed(() => timeVerb(this.report()));
   readonly life = computed(() => reportLifecycle(this.report()));
   readonly resVotes = computed(() => this.report().resolutionVotes);
@@ -105,6 +114,13 @@ export class DetailComponent {
       { label: 'Risolta',       sub: 'Quando 5+ vicini confermano',         time: isResolved ? 'ora' : '—', done: isResolved,            current: false,                 last: true  },
     ];
   });
+
+  /** Hue stabile (0-360) dal nome, per il colore avatar. */
+  private hueFrom(s: string): number {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+    return h;
+  }
 
   back(): void {
     this.location.back();

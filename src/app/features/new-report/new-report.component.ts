@@ -117,13 +117,18 @@ export class NewReportComponent {
     const desc = this.desc().trim();
     const cat = this.cat();
     const title = desc.split('\n')[0].slice(0, 60) || `${CATS[cat].label} segnalata`;
+    // Coordinate vicino a Trastevere/Roma con piccolo scostamento. Il pin-drop
+    // preciso dalla mappa e' un polish successivo (#21).
+    const jitter = () => (Math.random() - 0.5) * 0.012;
     this.data.addReport({
       cat,
       title,
+      note: desc,
       where: this.place().label,
-      time: 'ora',
+      lat: 41.8893 + jitter(),
+      lng: 12.4677 + jitter(),
       photo: this.photoKind(),
-      by: this.anon() ? 'anon' : this.auth.identity(),
+      anon: this.anon(),
     });
     this.toast.show(this.anon() ? 'Inviata in forma anonima, grazie' : 'Segnalazione inviata, grazie!');
     void this.router.navigateByUrl('/home');
