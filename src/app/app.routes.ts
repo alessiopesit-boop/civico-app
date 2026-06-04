@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { loginScreenGuard, onboardingGuard, onboardingScreenGuard } from './core/guards';
+import { completeProfileGuard, loginScreenGuard, onboardingGuard, onboardingScreenGuard } from './core/guards';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -15,6 +15,12 @@ export const routes: Routes = [
     canActivate: [loginScreenGuard],
     loadComponent: () =>
       import('./features/login/login.component').then(m => m.LoginComponent),
+  },
+  {
+    path: 'completa-profilo',
+    canActivate: [completeProfileGuard],
+    loadComponent: () =>
+      import('./features/complete-profile/complete-profile.component').then(m => m.CompleteProfileComponent),
   },
   {
     path: 'home',

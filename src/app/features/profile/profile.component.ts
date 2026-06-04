@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { CATS, USERS } from '../../core/data';
 import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
+import { ProfileService } from '../../core/profile.service';
 import type { Report, UserDef } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
@@ -29,10 +30,25 @@ export class ProfileComponent {
   private readonly location = inject(Location);
   private readonly auth = inject(AuthService);
   private readonly data = inject(DataService);
+  private readonly profileSvc = inject(ProfileService);
 
   protected readonly CATS = CATS;
 
-  readonly me = computed<UserDef>(() => USERS[this.auth.identity()]);
+  private readonly persona = computed<UserDef>(() => USERS[this.auth.identity()]);
+
+  /** Email reale dell'utente loggato. */
+  readonly email = computed(() => this.auth.email());
+
+  /** Identita' reale (se il profilo c'e'), altrimenti la persona del seed. */
+  readonly me = computed<UserDef>(() => {
+    const p = this.profileSvc.profile();
+    if (!p) return this.persona();
+    return {
+      initials: this.profileSvc.initials(),
+      name: this.profileSvc.displayName() ?? this.persona().name,
+      hue: this.hueFrom(p.nome + p.cognome),
+    };
+  });
   readonly myReports = computed<Report[]>(() =>
     this.data.reports().filter(r => r.by === this.auth.identity()).slice(0, 4),
   );
@@ -58,5 +74,12 @@ export class ProfileComponent {
   async logout(): Promise<void> {
     await this.auth.logout();
     void this.router.navigateByUrl('/login');
+  }
+
+  /** Hue stabile (0-360) derivato dal nome, per il colore dell'avatar. */
+  private hueFrom(s: string): number {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+    return h;
   }
 }

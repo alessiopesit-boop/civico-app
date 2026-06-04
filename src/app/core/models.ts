@@ -67,6 +67,15 @@ export interface Zone {
   comuneActive?: boolean;
 }
 
+export interface Profile {
+  id: string;
+  nome: string;
+  cognome: string;
+  birth_date: string; // ISO date (YYYY-MM-DD)
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type SortKey = 'rilevanti' | 'recenti' | 'vicine' | 'reazioni';
 export type FilterKey = 'tutto' | 'sicurezza' | 'disservizi' | 'risolti';
 export type PinStyle = 'coda' | 'rotondo' | 'minimal';
