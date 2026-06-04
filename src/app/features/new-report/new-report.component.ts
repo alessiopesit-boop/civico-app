@@ -34,7 +34,9 @@ export class NewReportComponent {
 
   readonly step = signal<1 | 2 | 3>(1);
   readonly cat = signal<CategoryKey>('buca');
-  readonly hasPhoto = signal<boolean>(false);
+  readonly photoFile = signal<File | null>(null);
+  readonly photoPreview = signal<string | null>(null);
+  readonly hasPhoto = computed(() => this.photoPreview() !== null);
   readonly desc = signal<string>('');
   readonly anon = signal<boolean>(false);
 
@@ -84,8 +86,21 @@ export class NewReportComponent {
     }
   }
 
-  togglePhoto(): void {
-    this.hasPhoto.update(v => !v);
+  onFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    if (!file) return;
+    const prev = this.photoPreview();
+    if (prev) URL.revokeObjectURL(prev);
+    this.photoFile.set(file);
+    this.photoPreview.set(URL.createObjectURL(file));
+  }
+
+  removePhoto(): void {
+    const prev = this.photoPreview();
+    if (prev) URL.revokeObjectURL(prev);
+    this.photoFile.set(null);
+    this.photoPreview.set(null);
   }
 
   selectCategory(k: CategoryKey): void {
@@ -129,6 +144,8 @@ export class NewReportComponent {
       lng: 12.4677 + jitter(),
       photo: this.photoKind(),
       anon: this.anon(),
+      photoFile: this.photoFile(),
+      photoPreview: this.photoPreview(),
     });
     this.toast.show(this.anon() ? 'Inviata in forma anonima, grazie' : 'Segnalazione inviata, grazie!');
     void this.router.navigateByUrl('/home');

@@ -43,6 +43,7 @@ export interface Report {
   recent6h: number;
   resolutionVotes: number;
   photo: PhotoKind;
+  photoUrl?: string | null;
   by: UserKey;
   // identita' reale (segnalazioni da Supabase): etichetta autore gia' resa
   // "Nome C." (null/anon se anonima) e coordinate reali per la mappa.

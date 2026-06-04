@@ -74,7 +74,7 @@
   <div class="reports">
     @for (r of myReports(); track r.id) {
       <button class="report-row" (click)="openReport(r.id)">
-        <cv-photo [kind]="r.photo" [w]="52" [h]="52" [radius]="10"/>
+        <cv-photo [kind]="r.photo" [url]="r.photoUrl" [w]="52" [h]="52" [radius]="10"/>
         <div class="rr-meta">
           <div class="rr-cat" [style.color]="CATS[r.cat].color">
             <cv-icon [name]="CATS[r.cat].iconName" [size]="11" [color]="CATS[r.cat].color"/>

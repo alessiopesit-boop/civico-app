@@ -13,7 +13,7 @@ import { PhotoComponent } from '../photo/photo.component';
   template: `
     <button class="row" (click)="cardClick.emit()" type="button">
       @if (showPhoto()) {
-        <cv-photo [kind]="r().photo" [w]="52" [h]="52" [radius]="10"/>
+        <cv-photo [kind]="r().photo" [url]="r().photoUrl" [w]="52" [h]="52" [radius]="10"/>
       }
       <div class="meta">
         <div class="top">

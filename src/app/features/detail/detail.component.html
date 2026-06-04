@@ -1,7 +1,7 @@
 <div class="detail">
   <!-- Hero photo -->
   <div class="hero">
-    <cv-photo [kind]="report().photo" [w]="500" [h]="280" [radius]="0"/>
+    <cv-photo [kind]="report().photo" [url]="report().photoUrl" [w]="500" [h]="280" [radius]="0"/>
     <div class="gradient"></div>
     <div class="hero-count">
       <cv-icon name="image" [size]="12" color="var(--cv-text)"/> 1 di 3
@@ -196,7 +196,7 @@
         <div class="sheet-sub">La tua conferma aiuta a capire se la situazione sta cambiando.</div>
       </div>
       <div class="sheet-card">
-        <cv-photo [kind]="report().photo" [w]="40" [h]="40" [radius]="8"/>
+        <cv-photo [kind]="report().photo" [url]="report().photoUrl" [w]="40" [h]="40" [radius]="8"/>
         <div class="sheet-card-text">
           <div class="sheet-card-title">{{ report().title }}</div>
           <div class="sheet-card-where">{{ report().where }}</div>
