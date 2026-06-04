@@ -54,4 +54,9 @@ export class ProfileComponent {
   openReport(id: number): void {
     if (id) void this.router.navigate(['/detail', id]);
   }
+
+  async logout(): Promise<void> {
+    await this.auth.logout();
+    void this.router.navigateByUrl('/login');
+  }
 }

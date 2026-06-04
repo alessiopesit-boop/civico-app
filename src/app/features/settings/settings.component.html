@@ -140,6 +140,14 @@
         <button class="row" (click)="logout()">
           <div class="row-text">
             <div class="row-title">Esci</div>
+            <div class="row-sub">Da questo dispositivo</div>
+          </div>
+          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
+        </button>
+        <button class="row danger" (click)="askLogoutAll()">
+          <div class="row-text">
+            <div class="row-title">Esci da tutti i dispositivi</div>
+            <div class="row-sub">Revoca ogni sessione attiva</div>
           </div>
           <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
         </button>
@@ -155,4 +163,20 @@
       {{ buildLabel }} · fatta dai cittadini.
     </div>
   </div>
+
+  @if (confirmAllOpen()) {
+    <div class="modal-overlay" (click)="cancelLogoutAll()">
+      <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <button type="button" class="modal-x" (click)="cancelLogoutAll()" aria-label="Chiudi">
+          <cv-icon name="close" [size]="16" color="var(--cv-text-mute)"/>
+        </button>
+        <div class="modal-title">Uscire da tutti i dispositivi?</div>
+        <div class="modal-sub">Verrà chiusa ogni sessione attiva, anche su altri telefoni o browser. Dovrai rientrare con un nuovo link.</div>
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel" (click)="cancelLogoutAll()">Annulla</button>
+          <button type="button" class="modal-confirm" (click)="confirmLogoutAll()">Esci ovunque</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

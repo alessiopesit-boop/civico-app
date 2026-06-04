@@ -73,6 +73,12 @@ export class AuthService {
     await this.sb.client?.auth.signOut();
   }
 
+  /** Revoca la sessione su TUTTI i dispositivi (non solo questo). */
+  async logoutAllDevices(): Promise<void> {
+    this._user.set(null);
+    await this.sb.client?.auth.signOut({ scope: 'global' });
+  }
+
   async resetAll(): Promise<void> {
     await this.logout();
     this.onboarded.set(false);

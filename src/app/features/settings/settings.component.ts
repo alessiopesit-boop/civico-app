@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -45,8 +45,19 @@ export class SettingsComponent {
   }
 
   logout(): void {
-    this.auth.logout();
+    void this.auth.logout();
     this.toast.show('Disconnesso');
+    void this.router.navigateByUrl('/login');
+  }
+
+  /** Modale "esci da tutti i dispositivi". */
+  readonly confirmAllOpen = signal(false);
+  askLogoutAll(): void { this.confirmAllOpen.set(true); }
+  cancelLogoutAll(): void { this.confirmAllOpen.set(false); }
+  async confirmLogoutAll(): Promise<void> {
+    this.confirmAllOpen.set(false);
+    await this.auth.logoutAllDevices();
+    this.toast.show('Uscito da tutti i dispositivi');
     void this.router.navigateByUrl('/login');
   }
 }
