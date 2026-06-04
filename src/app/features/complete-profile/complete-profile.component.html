@@ -1,0 +1,39 @@
+<div class="screen">
+  <header class="topbar">
+    <cv-wordmark [size]="16" [link]="false"/>
+  </header>
+
+  <div class="body">
+    <h1 class="headline">Completa il profilo</h1>
+    <p class="sub">Ci serve il tuo nome per la community. Agli altri mostriamo solo <b>Nome C.</b>, mai il nome completo.</p>
+
+    <form class="form" (ngSubmit)="submit()">
+      <label class="lbl">Nome</label>
+      <input class="field" type="text" placeholder="Marco" autocomplete="given-name"
+             [ngModel]="nome()" (ngModelChange)="nome.set($event)" name="nome"/>
+
+      <label class="lbl">Cognome</label>
+      <input class="field" type="text" placeholder="Rossi" autocomplete="family-name"
+             [ngModel]="cognome()" (ngModelChange)="cognome.set($event)" name="cognome"/>
+
+      <label class="lbl">Data di nascita</label>
+      <input class="field" type="date" [max]="maxDate"
+             [ngModel]="birth()" (ngModelChange)="birth.set($event)" name="birth"/>
+      <p class="hint">Serve solo a verificare l'età. Resta privata, non la vede nessun altro e non è modificabile dopo.</p>
+
+      @if (tooYoung()) {
+        <p class="err">Devi avere almeno 14 anni per usare Civico.</p>
+      }
+      @if (error()) {
+        <p class="err">{{ error() }}</p>
+      }
+
+      <button type="submit" class="cta" [class.is-enabled]="valid() && !saving()"
+              [disabled]="!valid() || saving()">
+        {{ saving() ? 'Salvataggio...' : 'Entra in Civico' }}
+      </button>
+    </form>
+
+    <p class="acct">Accesso come {{ auth.email() }}</p>
+  </div>
+</div>

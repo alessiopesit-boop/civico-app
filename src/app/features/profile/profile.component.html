@@ -12,6 +12,9 @@
     <cv-avatar [userObj]="me()" [size]="64"/>
     <div class="meta">
       <div class="name">{{ me().name }}</div>
+      @if (email()) {
+        <div class="email">{{ email() }}</div>
+      }
       <div class="loc">
         <cv-icon name="pinSmall" [size]="11" color="var(--cv-text-faint)"/>
         Trastevere, Roma
