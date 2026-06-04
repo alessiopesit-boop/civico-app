@@ -16,6 +16,23 @@ export function parseHours(t: string): number {
   return 9999;
 }
 
+/** Da timestamp ISO a stringa relativa italiana ("ora", "12 min fa", "3 ore
+ *  fa", "ieri", "4 giorni fa"). Compatibile con parseHours per il sort. */
+export function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return 'ora';
+  const mins = Math.floor((Date.now() - then) / 60000);
+  if (mins < 1) return 'ora';
+  if (mins < 60) return `${mins} min fa`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} ${hours === 1 ? 'ora' : 'ore'} fa`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'ieri';
+  if (days < 7) return `${days} giorni fa`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks} ${weeks === 1 ? 'settimana' : 'settimane'} fa`;
+}
+
 export function timeVerb(r: Report): 'avvenuta' | 'segnalata' {
   return CATS[r.cat].group === 'sicurezza' ? 'avvenuta' : 'segnalata';
 }
