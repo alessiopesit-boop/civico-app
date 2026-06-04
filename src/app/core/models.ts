@@ -67,8 +67,6 @@ export interface Zone {
   comuneActive?: boolean;
 }
 
-export type UserType = 'guest' | 'base' | 'active';
-
 export type SortKey = 'rilevanti' | 'recenti' | 'vicine' | 'reazioni';
 export type FilterKey = 'tutto' | 'sicurezza' | 'disservizi' | 'risolti';
 export type PinStyle = 'coda' | 'rotondo' | 'minimal';

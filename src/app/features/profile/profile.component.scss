@@ -267,3 +267,23 @@
   font-size: 13px;
   text-align: center;
 }
+
+.logout {
+  margin: 22px 0 8px;
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: var(--cv-red-soft);
+  border: 1px solid rgba(229, 72, 77, 0.28);
+  color: var(--cv-red);
+  font-family: var(--cv-font);
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:active { transform: scale(0.98); }
+}

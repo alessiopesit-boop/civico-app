@@ -1,51 +1,86 @@
-import { Injectable, computed } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import type { User } from '@supabase/supabase-js';
 import { persistedSignal } from './persisted-signal';
-import type { UserType, UserKey } from './models';
+import { SupabaseService } from './supabase.service';
+import type { UserKey } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  /** Whether the user has completed the onboarding splash. */
+  private readonly sb = inject(SupabaseService);
+
+  /** Whether the user has completed the onboarding splash (UX locale). */
   readonly onboarded = persistedSignal<boolean>('civico.onboarded', false);
 
-  /** Whether the user has authenticated (any method). */
-  readonly authed = persistedSignal<boolean>('civico.authed', false);
-
-  /** User identity (which persona avatar to use in the prototype). */
+  /** Persona del seed locale usata per avatar e autore (verra' sostituita
+   *  dal profilo reale in Fase C, quando le segnalazioni diventano remote). */
   readonly identity = persistedSignal<UserKey>('civico.identity', 'marco');
 
-  /** guest | base (email/Google, no OTP) | active (with phone OTP). */
-  readonly userType = persistedSignal<UserType>('civico.userType', 'active');
+  /** Utente Supabase loggato, o null. */
+  private readonly _user = signal<User | null>(null);
+  readonly user = this._user.asReadonly();
 
-  /** Whether the user has verified their phone number. */
-  readonly phoneVerified = computed(() => this.userType() === 'active');
+  /** true quando la sessione iniziale e' stata risolta (evita flicker/race
+   *  tra il guard e il ripristino sessione dopo il click sul magic-link). */
+  private readonly _ready = signal(false);
+  readonly ready = this._ready.asReadonly();
 
-  readonly canParticipate = computed(() => this.userType() === 'active');
+  /** Account presente = utente loggato. Niente piu' ospite. */
+  readonly authed = computed(() => this._user() !== null);
 
-  setUserType(t: UserType): void {
-    this.userType.set(t);
-    // Anche l'ospite e' "passato dal login": deve poter entrare nell'app in
-    // sola lettura. Le azioni che richiedono partecipazione (segnalare,
-    // confermare) restano gate da userType === 'active', non da authed.
-    this.authed.set(true);
+  /** Per l'MVP partecipa chiunque abbia un account (phone OTP rimandato). */
+  readonly canParticipate = this.authed;
+
+  /** Email dell'utente loggato, se disponibile. */
+  readonly email = computed(() => this._user()?.email ?? null);
+
+  /** Ripristina la sessione e si mette in ascolto dei cambi di auth.
+   *  Chiamata da provideAppInitializer prima del primo render. */
+  async init(): Promise<void> {
+    const client = this.sb.client;
+    if (!client) {
+      // Nessuna config Supabase: l'app resta locale e non autenticabile.
+      this._ready.set(true);
+      return;
+    }
+    const { data } = await client.auth.getSession();
+    this._user.set(data.session?.user ?? null);
+    client.auth.onAuthStateChange((_event, session) => {
+      this._user.set(session?.user ?? null);
+    });
+    this._ready.set(true);
+  }
+
+  /** Invia un magic-link all'email indicata. Al click l'utente torna sull'app
+   *  (document.baseURI) e la sessione viene ripristinata automaticamente. */
+  async sendMagicLink(email: string): Promise<{ error: string | null }> {
+    const client = this.sb.client;
+    if (!client) return { error: 'Backend non configurato.' };
+    const { error } = await client.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: document.baseURI },
+    });
+    return { error: error?.message ?? null };
   }
 
   finishOnboarding(): void {
     this.onboarded.set(true);
   }
 
-  loginAs(t: UserType, id: UserKey = 'marco'): void {
-    this.identity.set(id);
-    this.setUserType(t);
+  async logout(): Promise<void> {
+    // Azzera subito lo stato locale: la navigazione verso /login che segue
+    // deve vedere authed=false senza aspettare la rete.
+    this._user.set(null);
+    await this.sb.client?.auth.signOut();
   }
 
-  logout(): void {
-    this.authed.set(false);
-    this.userType.set('guest');
+  /** Revoca la sessione su TUTTI i dispositivi (non solo questo). */
+  async logoutAllDevices(): Promise<void> {
+    this._user.set(null);
+    await this.sb.client?.auth.signOut({ scope: 'global' });
   }
 
-  resetAll(): void {
-    this.authed.set(false);
+  async resetAll(): Promise<void> {
+    await this.logout();
     this.onboarded.set(false);
-    this.userType.set('guest');
   }
 }

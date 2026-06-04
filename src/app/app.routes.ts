@@ -17,11 +17,6 @@ export const routes: Routes = [
       import('./features/login/login.component').then(m => m.LoginComponent),
   },
   {
-    path: 'add-phone',
-    loadComponent: () =>
-      import('./features/add-phone/add-phone.component').then(m => m.AddPhoneComponent),
-  },
-  {
     path: 'home',
     canActivate: [onboardingGuard],
     loadComponent: () =>

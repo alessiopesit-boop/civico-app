@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../core/toast.service';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 import { WordmarkComponent } from '../../shared/wordmark/wordmark.component';
 
-type LoginMode = 'options' | 'email';
+type LoginMode = 'email' | 'sent';
 
 @Component({
   selector: 'cv-login',
@@ -19,41 +19,37 @@ type LoginMode = 'options' | 'email';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly auth = inject(AuthService);
   private readonly toast = inject(ToastService);
 
-  readonly mode = signal<LoginMode>('options');
+  readonly mode = signal<LoginMode>('email');
   readonly email = signal('');
-  readonly password = signal('');
+  readonly sending = signal(false);
+
+  readonly emailValid = computed(() => /^\S+@\S+\.\S+$/.test(this.email().trim()));
 
   back(): void {
-    if (this.mode() !== 'options') {
-      this.mode.set('options');
+    if (this.mode() === 'sent') {
+      this.mode.set('email');
       return;
     }
     this.location.back();
   }
 
-  /** Google / email: account base + propose phone OTP. */
-  goBase(method: 'Google' | 'via email'): void {
-    this.auth.loginAs('base');
-    this.toast.show(`Account creato (${method})`);
-    void this.router.navigate(['/add-phone'], { replaceUrl: true });
+  async sendLink(): Promise<void> {
+    if (!this.emailValid() || this.sending()) return;
+    this.sending.set(true);
+    const { error } = await this.auth.sendMagicLink(this.email());
+    this.sending.set(false);
+    if (error) {
+      this.toast.show('Invio non riuscito, riprova tra poco');
+      return;
+    }
+    this.mode.set('sent');
   }
 
-  goGuest(): void {
-    this.auth.loginAs('guest');
-    this.toast.show('Stai esplorando come ospite');
-    void this.router.navigate(['/home'], { replaceUrl: true });
-  }
-
-  canSubmitEmail(): boolean {
-    return this.email().trim() !== '' && this.password().trim() !== '';
-  }
-
-  forgotPassword(): void {
-    this.toast.show('Useremo un OTP via email');
+  resend(): void {
+    void this.sendLink();
   }
 }
