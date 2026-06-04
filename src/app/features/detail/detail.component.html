@@ -35,9 +35,12 @@
     <div class="body">
       <h1 class="title">{{ report().title }}</h1>
 
-      <div class="author">
+      <div class="author" [class.tappable]="!!report().authorId" (click)="goAuthor()">
         <cv-avatar [userObj]="author()" [size]="26"/>
         <span class="name">{{ author().name }}</span>
+        @if (report().authorId) {
+          <cv-icon name="chevron" [size]="12" color="var(--cv-text-faint)"/>
+        }
         <span class="dot"></span>
         <span class="ago">
           <cv-icon name="clock" [size]="11" color="var(--cv-text-faint)"/>

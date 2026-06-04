@@ -21,6 +21,7 @@ interface ReportRow {
   status: string;
   created_at: string;
   author_label: string | null;
+  author_id: string | null;
   confirms: number;
   recent6h: number;
   resolution_votes: number;
@@ -162,6 +163,7 @@ export class DataService {
       photoUrl: row.photo_url,
       by: 'anon',
       authorLabel: row.author_label,
+      authorId: row.author_id,
       anon: row.anon,
       lat: row.lat ?? undefined,
       lng: row.lng ?? undefined,
@@ -313,6 +315,30 @@ export class DataService {
         this.myReportIds.update(s => new Set(s).add(realId));
       }
     })();
+  }
+
+  /** Profilo pubblico di un altro utente (solo campi sicuri). */
+  async getPublicProfile(id: string): Promise<{ displayName: string; memberSince: string | null } | null> {
+    const client = this.sb.client;
+    if (!client) return null;
+    const { data } = await client.from('public_profiles').select('*').eq('id', id).maybeSingle();
+    if (!data) return null;
+    const row = data as { display_name: string; member_since: string | null };
+    return { displayName: row.display_name, memberSince: row.member_since };
+  }
+
+  /** Segnalazioni pubbliche (non anonime) di un dato autore. */
+  async loadUserReports(id: string): Promise<Report[]> {
+    const client = this.sb.client;
+    if (!client) return [];
+    const { data } = await client
+      .from('reports_public')
+      .select('*')
+      .eq('author_id', id)
+      .order('created_at', { ascending: false });
+    const followed = new Set(this.followedIds());
+    const flagged = new Set(this.flaggedIds());
+    return ((data ?? []) as ReportRow[]).map(row => this.mapRow(row, followed, flagged));
   }
 
   markAllNotificationsRead(): void {

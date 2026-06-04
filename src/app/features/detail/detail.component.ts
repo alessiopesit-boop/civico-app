@@ -126,6 +126,11 @@ export class DetailComponent {
     return h;
   }
 
+  goAuthor(): void {
+    const aid = this.report().authorId;
+    if (aid) void this.router.navigate(['/u', aid]);
+  }
+
   back(): void {
     this.location.back();
   }

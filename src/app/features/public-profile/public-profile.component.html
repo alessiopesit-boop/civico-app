@@ -1,0 +1,73 @@
+<div class="screen">
+  <div class="topbar">
+    <cv-icon-btn (btnClick)="back()">
+      <cv-icon name="arrow" [size]="15" color="var(--cv-text)"/>
+    </cv-icon-btn>
+    <span class="topbar-title">Profilo</span>
+    <span class="spacer"></span>
+  </div>
+
+  @if (loading()) {
+    <div class="empty">Carico…</div>
+  } @else if (!profile()) {
+    <div class="empty">Profilo non disponibile.</div>
+  } @else {
+    <div class="head">
+      <cv-avatar [userObj]="avatar()" [size]="64"/>
+      <div class="meta">
+        <div class="name">{{ profile()!.displayName }}</div>
+        @if (memberSince()) {
+          <div class="since">
+            <cv-icon name="sparkle" [size]="11" color="var(--cv-amber)"/>
+            Su Civico da {{ memberSince() }}
+          </div>
+        }
+        <div class="privacy">Profilo pubblico · vedi solo ciò che condivide</div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">{{ aperte() }}</div>
+        <div class="stat-label">Segnalazioni</div>
+        <div class="stat-sub">aperte</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">{{ risolte() }}</div>
+        <div class="stat-label">Risolte</div>
+        <div class="stat-sub">nella zona</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">{{ reports().length }}</div>
+        <div class="stat-label">Totali</div>
+        <div class="stat-sub">pubbliche</div>
+      </div>
+    </div>
+
+    <div class="eyebrow">Le sue segnalazioni pubbliche</div>
+    <div class="reports">
+      @for (r of reports(); track r.id) {
+        <button class="report-row" (click)="openReport(r.id)">
+          <cv-photo [kind]="r.photo" [url]="r.photoUrl" [w]="52" [h]="52" [radius]="10"/>
+          <div class="rr-meta">
+            <div class="rr-cat" [style.color]="CATS[r.cat].color">
+              <cv-icon [name]="CATS[r.cat].iconName" [size]="11" [color]="CATS[r.cat].color"/>
+              {{ CATS[r.cat].label }}
+            </div>
+            <div class="rr-title">{{ r.title }}</div>
+            <div class="rr-where">
+              <cv-icon name="pinSmall" [size]="10" color="var(--cv-text-faint)"/>
+              {{ r.where }} · {{ r.time }}
+            </div>
+          </div>
+          <div class="rr-right">
+            <div class="rr-num" [class.resolved]="r.cat === 'risolto'">{{ r.confirms }}</div>
+            <div class="rr-num-lab">CONFERME</div>
+          </div>
+        </button>
+      } @empty {
+        <div class="empty">Nessuna segnalazione pubblica.</div>
+      }
+    </div>
+  }
+</div>

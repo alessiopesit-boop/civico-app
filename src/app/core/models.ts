@@ -48,6 +48,7 @@ export interface Report {
   // identita' reale (segnalazioni da Supabase): etichetta autore gia' resa
   // "Nome C." (null/anon se anonima) e coordinate reali per la mappa.
   authorLabel?: string | null;
+  authorId?: string | null;
   anon?: boolean;
   lat?: number;
   lng?: number;
