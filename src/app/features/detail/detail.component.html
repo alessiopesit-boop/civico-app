@@ -175,6 +175,13 @@
           {{ inResolution() ? 'Confermo: è risolta' : 'Proponi come risolta' }}
         </button>
       }
+
+      @if (isMine()) {
+        <button class="delete-report" (click)="askDelete()">
+          <cv-icon name="trash" [size]="14" color="var(--cv-red)"/>
+          Elimina segnalazione
+        </button>
+      }
     </div>
   </div>
 </div>
@@ -270,6 +277,23 @@
         </button>
       </div>
       <button class="sheet-cancel" (click)="closeFlag()">Annulla</button>
+    </div>
+  </div>
+}
+
+<!-- Conferma eliminazione (solo autore) -->
+@if (deleteOpen()) {
+  <div class="overlay center" (click)="cancelDelete()">
+    <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <button type="button" class="modal-x" (click)="cancelDelete()" aria-label="Chiudi">
+        <cv-icon name="close" [size]="16" color="var(--cv-text-mute)"/>
+      </button>
+      <div class="modal-title">Eliminare la segnalazione?</div>
+      <div class="modal-sub">Sparirà per tutti e non si può annullare. Le conferme dei vicini andranno perse.</div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" (click)="cancelDelete()">Annulla</button>
+        <button type="button" class="modal-confirm" (click)="confirmDelete()">Elimina</button>
+      </div>
     </div>
   </div>
 }

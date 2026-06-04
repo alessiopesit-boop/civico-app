@@ -175,6 +175,27 @@ export class DataService {
     return this.reports().find(r => r.id === id);
   }
 
+  /** true se la segnalazione e' stata scritta dall'utente loggato. */
+  isMine(id: number): boolean {
+    return this.myReportIds().has(id);
+  }
+
+  /** Elimina una propria segnalazione (RLS consente solo le proprie). */
+  async deleteReport(id: number): Promise<boolean> {
+    const client = this.sb.client;
+    const userId = this.auth.user()?.id;
+    if (!client || !userId) return false;
+    const { error } = await client.from('reports').delete().eq('id', id);
+    if (error) return false;
+    this.reports.update(list => list.filter(r => r.id !== id));
+    this.myReportIds.update(s => {
+      const next = new Set(s);
+      next.delete(id);
+      return next;
+    });
+    return true;
+  }
+
   confirm(id: number, kind: 'visto' | 'peggiorata' | 'risolta'): void {
     const key = `${id}:${kind}`;
     if (this.confirmedKeys().includes(key)) return; // gia' votato su questo device
