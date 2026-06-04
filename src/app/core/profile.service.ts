@@ -54,13 +54,19 @@ export class ProfileService {
       this._loaded.set(true);
       return;
     }
-    const { data } = await client
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
-    this._profile.set((data as Profile | null) ?? null);
-    this._loaded.set(true);
+    try {
+      const { data } = await client
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      this._profile.set((data as Profile | null) ?? null);
+    } catch {
+      // Errore di rete/tabella: non bloccare l'avvio, resta senza profilo.
+      this._profile.set(null);
+    } finally {
+      this._loaded.set(true);
+    }
   }
 
   /** Crea il profilo per l'utente loggato. Il cancello dei 14 anni e'

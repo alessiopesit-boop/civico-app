@@ -12,9 +12,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     // Risolve sessione + profilo prima del primo render: cosi' i guard vedono
     // subito lo stato corretto (anche al ritorno dal magic-link).
-    provideAppInitializer(async () => {
-      await inject(AuthService).init();
-      await inject(ProfileService).init();
+    // NB: inject() va chiamato sincrono PRIMA di qualsiasi await (contesto DI).
+    provideAppInitializer(() => {
+      const auth = inject(AuthService);
+      const profile = inject(ProfileService);
+      return auth.init().then(() => profile.init());
     }),
   ],
 };
