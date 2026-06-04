@@ -1,0 +1,35 @@
+name: Keep Supabase alive
+
+# Sul piano free, un progetto Supabase senza richieste per ~7 giorni va in
+# pausa. Questo job fa una query leggera al DB ogni 3 giorni per azzerare il
+# timer di inattivita'. Costo zero, nessun servizio esterno.
+
+on:
+  schedule:
+    # Alle 06:00 UTC, ogni 3 giorni del mese (margine ampio sui 7 giorni).
+    - cron: "0 6 */3 * *"
+  workflow_dispatch: {}
+
+# La publishable key e' pubblica per natura (e' gia' nel bundle del frontend,
+# protetta dalle RLS): non e' un segreto, puo' stare qui.
+env:
+  SUPABASE_URL: "https://pbhulkwydgdeuvdcnnol.supabase.co"
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_hur8fx6_8mstumRoKAn0eQ_CNqZMBoS"
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query leggera a Supabase
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/profiles?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}")
+          echo "HTTP ${code}"
+          if [ "${code}" != "200" ]; then
+            echo "Keep-alive fallito (atteso 200)."
+            exit 1
+          fi
+          echo "Supabase sveglio."
