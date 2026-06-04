@@ -21,10 +21,14 @@ const TONES: Record<PhotoKind, [string, string]> = {
          [style.width.px]="w()"
          [style.height.px]="h()"
          [style.border-radius.px]="radius()"
-         [style.background]="bg()">
-      <div class="gloss"></div>
-      @if (label()) {
-        <div class="label">{{ label() }}</div>
+         [style.background]="url() ? 'var(--cv-surface-2)' : bg()">
+      @if (url()) {
+        <img class="img" [src]="url()" alt="" loading="lazy"/>
+      } @else {
+        <div class="gloss"></div>
+        @if (label()) {
+          <div class="label">{{ label() }}</div>
+        }
       }
     </div>
   `,
@@ -34,6 +38,11 @@ const TONES: Record<PhotoKind, [string, string]> = {
       flex-shrink: 0;
       overflow: hidden;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+    .img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
     }
     .gloss {
       position: absolute; inset: 0;
@@ -52,6 +61,7 @@ const TONES: Record<PhotoKind, [string, string]> = {
 })
 export class PhotoComponent {
   readonly kind = input<PhotoKind>('dark');
+  readonly url = input<string | null | undefined>(null);
   readonly w = input<number>(64);
   readonly h = input<number>(64);
   readonly radius = input<number>(10);

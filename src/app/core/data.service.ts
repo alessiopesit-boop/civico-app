@@ -16,6 +16,7 @@ interface ReportRow {
   lat: number | null;
   lng: number | null;
   photo: string | null;
+  photo_url: string | null;
   anon: boolean;
   status: string;
   created_at: string;
@@ -158,6 +159,7 @@ export class DataService {
       recent6h: row.recent6h,
       resolutionVotes: row.resolution_votes,
       photo: (row.photo ?? 'asphalt') as PhotoKind,
+      photoUrl: row.photo_url,
       by: 'anon',
       authorLabel: row.author_label,
       anon: row.anon,
@@ -228,7 +230,8 @@ export class DataService {
     this.reports.update(list => list.map(r => r.id === id ? { ...r, flagged: true } : r));
   }
 
-  /** Crea una nuova segnalazione (ottimistica + scrittura su Supabase). */
+  /** Crea una nuova segnalazione (ottimistica + scrittura su Supabase).
+   *  Se c'e' una foto, la carica su Storage e ne salva l'URL pubblico. */
   addReport(input: {
     cat: CategoryKey;
     title: string;
@@ -238,6 +241,8 @@ export class DataService {
     lng?: number;
     photo: PhotoKind;
     anon: boolean;
+    photoFile?: File | null;
+    photoPreview?: string | null;
   }): void {
     const authorLabel = input.anon ? null : this.profile.displayName();
     const optimistic: Report = {
@@ -250,6 +255,7 @@ export class DataService {
       recent6h: 0,
       resolutionVotes: 0,
       photo: input.photo,
+      photoUrl: input.photoPreview ?? null, // anteprima locale immediata
       by: 'anon',
       authorLabel,
       anon: input.anon,
@@ -265,6 +271,20 @@ export class DataService {
     if (!client || !userId) return;
 
     void (async () => {
+      // Upload foto su Storage (se presente).
+      let photoUrl: string | null = null;
+      if (input.photoFile) {
+        const ext = (input.photoFile.name.split('.').pop() || 'jpg').toLowerCase();
+        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const up = await client.storage.from('report-photos').upload(path, input.photoFile, {
+          contentType: input.photoFile.type || 'image/jpeg',
+          upsert: false,
+        });
+        if (!up.error) {
+          photoUrl = client.storage.from('report-photos').getPublicUrl(path).data.publicUrl;
+        }
+      }
+
       const { data } = await client
         .from('reports')
         .insert({
@@ -277,16 +297,18 @@ export class DataService {
           lat: input.lat ?? null,
           lng: input.lng ?? null,
           photo: input.photo,
+          photo_url: photoUrl,
           anon: input.anon,
           status: 'attiva',
         })
         .select('id, created_at')
         .single();
       if (data) {
-        // Sostituisce l'id ottimistico con quello reale del DB.
         const realId = data.id as number;
         this.reports.update(list => list.map(r =>
-          r.id === optimistic.id ? { ...r, id: realId, createdAt: data.created_at as string } : r,
+          r.id === optimistic.id
+            ? { ...r, id: realId, createdAt: data.created_at as string, photoUrl: photoUrl ?? r.photoUrl }
+            : r,
         ));
         this.myReportIds.update(s => new Set(s).add(realId));
       }

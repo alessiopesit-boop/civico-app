@@ -24,9 +24,10 @@
           <h1 class="heading">Foto e categoria</h1>
           <p class="sub">Una foto vale 100 parole. Scegli cosa hai visto.</p>
 
-          <button class="photo-slot" [class.has]="hasPhoto()" (click)="togglePhoto()">
+          <input #photoInput type="file" accept="image/*" hidden (change)="onFile($event)"/>
+          <button class="photo-slot" [class.has]="hasPhoto()" (click)="photoInput.click()">
             @if (hasPhoto()) {
-              <cv-photo [kind]="photoKind()" [w]="350" [h]="188" [radius]="16"/>
+              <cv-photo [url]="photoPreview()" [w]="350" [h]="188" [radius]="16"/>
               <span class="badge-shot">SCATTATA</span>
             } @else {
               <div class="ph-icon">
@@ -100,7 +101,7 @@
           </p>
 
           <div class="recap">
-            <cv-photo [kind]="photoKind()" [w]="48" [h]="48" [radius]="9"/>
+            <cv-photo [kind]="photoKind()" [url]="photoPreview()" [w]="48" [h]="48" [radius]="9"/>
             <div class="recap-text">
               <cv-category-badge [cat]="cat()" [sm]="true"/>
               <div class="recap-where">
