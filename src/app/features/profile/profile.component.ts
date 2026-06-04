@@ -40,15 +40,7 @@ export class ProfileComponent {
   readonly email = computed(() => this.auth.email());
 
   /** Identita' reale (se il profilo c'e'), altrimenti la persona del seed. */
-  readonly me = computed<UserDef>(() => {
-    const p = this.profileSvc.profile();
-    if (!p) return this.persona();
-    return {
-      initials: this.profileSvc.initials(),
-      name: this.profileSvc.displayName() ?? this.persona().name,
-      hue: this.hueFrom(p.nome + p.cognome),
-    };
-  });
+  readonly me = computed<UserDef>(() => this.profileSvc.userDef() ?? this.persona());
   readonly myReports = computed<Report[]>(() =>
     this.data.reports().filter(r => r.by === this.auth.identity()).slice(0, 4),
   );
@@ -74,12 +66,5 @@ export class ProfileComponent {
   async logout(): Promise<void> {
     await this.auth.logout();
     void this.router.navigateByUrl('/login');
-  }
-
-  /** Hue stabile (0-360) derivato dal nome, per il colore dell'avatar. */
-  private hueFrom(s: string): number {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-    return h;
   }
 }
