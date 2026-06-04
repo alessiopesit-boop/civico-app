@@ -48,6 +48,17 @@ export class DataService {
     return withCoords.map(r => ({ id: r.id, cat: r.cat, xp: 0, yp: 0, lat: r.lat!, lng: r.lng! }));
   });
 
+  // Le mie segnalazioni: id delle righe il cui author_id sono io (dalla tabella
+  // base, che via RLS mi lascia leggere le mie). Le abbino all'elenco pubblico
+  // per avere anche i contatori.
+  private readonly myReportIds = signal<Set<number>>(new Set());
+  readonly myReports = computed<Report[]>(() => {
+    const mine = this.myReportIds();
+    return this.reports().filter(r => mine.has(r.id));
+  });
+  /** Conferme date da me (numero di righe in confirmations a mio nome). */
+  readonly myConfirmCount = signal<number>(0);
+
   // Notifiche (ancora seed locale per ora).
   readonly notifications = signal<Notification[]>([...SEED_NOTIFICATIONS]);
   readonly unreadNotificationsCount = computed(
@@ -92,7 +103,29 @@ export class DataService {
       effect(() => {
         this.auth.user(); // dipendenza: ricarica al cambio sessione
         void this.loadReports();
+        void this.loadMine();
       });
+    }
+  }
+
+  /** Carica id delle mie segnalazioni e il conteggio delle conferme date. */
+  private async loadMine(): Promise<void> {
+    const client = this.sb.client;
+    const userId = this.auth.user()?.id;
+    if (!client || !userId) {
+      this.myReportIds.set(new Set());
+      this.myConfirmCount.set(0);
+      return;
+    }
+    try {
+      const [mine, confs] = await Promise.all([
+        client.from('reports').select('id').eq('author_id', userId),
+        client.from('confirmations').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+      ]);
+      this.myReportIds.set(new Set(((mine.data ?? []) as { id: number }[]).map(r => r.id)));
+      this.myConfirmCount.set(confs.count ?? 0);
+    } catch {
+      // Errore di rete: lascia i valori correnti.
     }
   }
 
@@ -158,6 +191,7 @@ export class DataService {
     const client = this.sb.client;
     const userId = this.auth.user()?.id;
     if (client && userId && id > 0) {
+      this.myConfirmCount.update(n => n + 1);
       void client.from('confirmations').insert({ report_id: id, user_id: userId, kind });
     }
   }
@@ -229,9 +263,11 @@ export class DataService {
         .single();
       if (data) {
         // Sostituisce l'id ottimistico con quello reale del DB.
+        const realId = data.id as number;
         this.reports.update(list => list.map(r =>
-          r.id === optimistic.id ? { ...r, id: data.id as number, createdAt: data.created_at as string } : r,
+          r.id === optimistic.id ? { ...r, id: realId, createdAt: data.created_at as string } : r,
         ));
+        this.myReportIds.update(s => new Set(s).add(realId));
       }
     })();
   }

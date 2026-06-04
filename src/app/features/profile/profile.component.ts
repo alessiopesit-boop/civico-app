@@ -41,15 +41,18 @@ export class ProfileComponent {
 
   /** Identita' reale (se il profilo c'e'), altrimenti la persona del seed. */
   readonly me = computed<UserDef>(() => this.profileSvc.userDef() ?? this.persona());
-  readonly myReports = computed<Report[]>(() =>
-    this.data.reports().filter(r => r.by === this.auth.identity()).slice(0, 4),
-  );
+  readonly myReports = computed<Report[]>(() => this.data.myReports().slice(0, 4));
 
-  readonly stats = computed(() => [
-    { label: 'Segnalazioni',  value: this.myReports().length || 6, sub: 'aperte',      trend: '+2' as string | null },
-    { label: 'Conferme date', value: 38,                            sub: 'a vicini',    trend: '+12 sett.' as string | null },
-    { label: 'Risolte',       value: 4,                             sub: 'grazie a te', trend: null as string | null },
-  ]);
+  readonly stats = computed(() => {
+    const mine = this.data.myReports();
+    const aperte = mine.filter(r => r.cat !== 'risolto').length;
+    const risolte = mine.filter(r => r.cat === 'risolto').length;
+    return [
+      { label: 'Segnalazioni',  value: aperte,                  sub: 'aperte',      trend: null as string | null },
+      { label: 'Conferme date', value: this.data.myConfirmCount(), sub: 'date',     trend: null as string | null },
+      { label: 'Risolte',       value: risolte,                 sub: 'grazie a te', trend: null as string | null },
+    ];
+  });
 
   readonly badges: BadgeTile[] = [
     { label: 'Primo passo',        color: 'var(--cv-amber)',     locked: false },
