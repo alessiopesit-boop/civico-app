@@ -162,12 +162,11 @@
   margin: 14px 14px 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 10px;
 }
 .logout-btn {
-  align-self: center;
-  padding: 11px 22px;
+  width: 100%;
+  padding: 13px 14px;
   border-radius: 12px;
   cursor: pointer;
   font-family: var(--cv-font);
@@ -176,6 +175,9 @@
   background: var(--cv-red-soft);
   border: 1px solid rgba(229, 72, 77, 0.28);
   color: var(--cv-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:active { transform: scale(0.98); }
 
@@ -184,7 +186,6 @@
     border-color: transparent;
     font-weight: 700;
     font-size: 13px;
-    padding: 4px 12px;
   }
 }
 
