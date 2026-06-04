@@ -158,7 +158,36 @@
   line-height: 1.6;
 }
 
-.row.danger .row-title { color: var(--cv-red); }
+.logout-actions {
+  margin: 14px 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.logout-btn {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--cv-font);
+  font-weight: 800;
+  font-size: 14px;
+  background: var(--cv-red-soft);
+  border: 1px solid rgba(229, 72, 77, 0.28);
+  color: var(--cv-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active { transform: scale(0.98); }
+
+  &.ghost {
+    background: transparent;
+    border-color: transparent;
+    font-weight: 700;
+    font-size: 13px;
+  }
+}
 
 .modal-overlay {
   position: absolute;

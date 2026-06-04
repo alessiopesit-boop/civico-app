@@ -137,20 +137,10 @@
           </div>
           <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
         </button>
-        <button class="row" (click)="logout()">
-          <div class="row-text">
-            <div class="row-title">Esci</div>
-            <div class="row-sub">Da questo dispositivo</div>
-          </div>
-          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
-        </button>
-        <button class="row danger" (click)="askLogoutAll()">
-          <div class="row-text">
-            <div class="row-title">Esci da tutti i dispositivi</div>
-            <div class="row-sub">Revoca ogni sessione attiva</div>
-          </div>
-          <cv-icon name="chevron" [size]="14" color="var(--cv-text-faint)"/>
-        </button>
+      </div>
+
+      <div class="logout-actions">
+        <button type="button" class="logout-btn" (click)="askLogoutAll()">Esci da tutti i dispositivi</button>
       </div>
     </section>
 

@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { AuthService } from './auth.service';
 import { SupabaseService } from './supabase.service';
-import type { Profile } from './models';
+import type { Profile, UserDef } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
@@ -31,6 +31,24 @@ export class ProfileService {
     if (!p) return '';
     return (p.nome.trim().charAt(0) + p.cognome.trim().charAt(0)).toUpperCase();
   });
+
+  /** Identita' reale come UserDef per l'avatar, o null se non c'e' profilo. */
+  readonly userDef = computed<UserDef | null>(() => {
+    const p = this._profile();
+    if (!p) return null;
+    return {
+      initials: this.initials(),
+      name: this.displayName() ?? p.nome.trim(),
+      hue: this.hueFrom(p.nome + p.cognome),
+    };
+  });
+
+  /** Hue stabile (0-360) derivato dal nome, per il colore dell'avatar. */
+  private hueFrom(s: string): number {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
+    return h;
+  }
 
   constructor() {
     // Ricarica il profilo a ogni cambio di utente loggato (login/logout,

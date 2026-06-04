@@ -11,9 +11,11 @@ import {
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
+import { ProfileService } from '../../core/profile.service';
 import { SettingsService } from '../../core/settings.service';
 import { ToastService } from '../../core/toast.service';
-import type { FilterKey, Pin, SortKey } from '../../core/models';
+import { USERS } from '../../core/data';
+import type { FilterKey, Pin, SortKey, UserDef } from '../../core/models';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { LeafletMapComponent } from '../../shared/leaflet-map/leaflet-map.component';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
@@ -61,6 +63,7 @@ const SORT_LABELS: Record<SortKey, string> = {
 export class HomeComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly profileSvc = inject(ProfileService);
   private readonly toast = inject(ToastService);
   private readonly settings = inject(SettingsService);
   readonly data = inject(DataService);
@@ -71,6 +74,9 @@ export class HomeComponent implements OnDestroy {
   readonly sortOptionsKeys: SortKey[] = ['rilevanti', 'recenti', 'vicine', 'reazioni'];
 
   readonly identity = this.auth.identity;
+
+  /** Avatar dell'header: identita' reale se il profilo c'e', altrimenti persona. */
+  readonly avatar = computed<UserDef>(() => this.profileSvc.userDef() ?? USERS[this.identity()]);
 
   readonly containerH = signal<number>(this.computeContainerH());
 
