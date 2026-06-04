@@ -45,75 +45,34 @@
   line-height: 1.5;
 }
 
-.options {
-  margin-top: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.sent {
+  margin-top: 36px;
+  text-align: center;
 }
-.opt {
-  width: 100%;
-  padding: 13px 14px;
-  border-radius: 12px;
-  cursor: pointer;
+.sent-icon {
+  width: 56px; height: 56px;
+  border-radius: 28px;
+  margin: 0 auto 18px;
+  background: var(--cv-amber-soft);
+  border: 1px solid rgba(245, 165, 36, 0.27);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-weight: 800;
-  font-size: 14.5px;
-  border: 1px solid var(--cv-border);
-  background: var(--cv-surface);
-  color: var(--cv-text);
-
-  &.google {
-    background: var(--cv-text);
-    color: var(--cv-bg);
-    border: none;
-  }
-  &.email {
-    font-weight: 700;
-    font-size: 14px;
-  }
 }
-
-.divider {
-  margin: 24px 0 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.sent .sub b { color: var(--cv-text); font-weight: 700; }
+.resend-note {
+  margin-top: 18px;
   color: var(--cv-text-faint);
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-
-  &::before, &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--cv-border-s);
-  }
-}
-
-.guest {
-  width: 100%;
-  padding: 13px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  background: transparent;
-  color: var(--cv-text-mute);
-  border: 1px solid var(--cv-border-s);
-  font-weight: 600;
-  font-size: 13px;
-}
-.guest-note {
-  color: var(--cv-text-faint);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  text-align: center;
-  margin: 8px 0 0;
-  line-height: 1.45;
+  line-height: 1.5;
+
+  a {
+    color: var(--cv-text);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
 
 .legal {
@@ -173,27 +132,3 @@
   }
 }
 
-.forgot {
-  margin-top: 14px;
-  text-align: center;
-
-  a {
-    color: var(--cv-text-mute);
-    font-size: 12.5px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-}
-.signup {
-  margin-top: 12px;
-  color: var(--cv-text-faint);
-  font-size: 11.5px;
-  font-weight: 500;
-  text-align: center;
-
-  a {
-    color: var(--cv-text);
-    font-weight: 700;
-    cursor: pointer;
-  }
-}

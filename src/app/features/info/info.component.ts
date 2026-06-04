@@ -46,7 +46,7 @@ export class InfoComponent {
       { type: 'callout', kind: 'warn', title: 'Civico non sostituisce 112, 113, 115', body: "Se è in corso un fatto pericoloso, chiama prima i numeri d'emergenza. Civico è memoria di zona: serve a vicini e Comune per capire ricorrenze, non a chiamare l'intervento." },
     ],
     privacy: [
-      { type: 'section', title: 'Cosa raccogliamo', body: "Email o numero di cellulare per l'account, posizione GPS solo al momento della verifica zona (un singolo ping, non tracking continuo), foto e testi che pubblichi tu. Tutto qui." },
+      { type: 'section', title: 'Cosa raccogliamo', body: "Email per l'account, posizione GPS solo al momento della verifica zona (un singolo ping, non tracking continuo), foto e testi che pubblichi tu. Tutto qui." },
       { type: 'section', title: 'Cosa NON raccogliamo', body: 'Cronologia spostamenti, contatti rubrica, dati pubblicitari, profilo comportamentale. Non vendiamo i tuoi dati. Non integriamo tracker di terze parti.' },
       { type: 'section', title: 'Anonimato sulla sicurezza', body: 'Le segnalazioni di sicurezza (furti, vandalismi) sono anonime per default: i vicini non vedono il tuo nome né le tue iniziali. Puoi disattivarlo nelle impostazioni, ma è sconsigliato.' },
       { type: 'section', title: 'Cosa vedono gli altri di te', body: 'Pseudonimo (es. "Marco T."), iniziali colorate, badge raggiunti, segnalazioni pubbliche che hai aperto, conferme aggregate. Mai email, numero, indirizzo esatto.' },
