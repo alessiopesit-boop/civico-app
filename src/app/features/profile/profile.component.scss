@@ -277,8 +277,12 @@
   text-align: center;
 }
 
-.logout {
+.logout-actions {
   margin: 22px 18px 8px;
+  display: flex;
+}
+.logout {
+  flex: 1;
   padding: 13px 14px;
   border-radius: 12px;
   cursor: pointer;
