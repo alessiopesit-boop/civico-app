@@ -91,6 +91,10 @@ export class DetailComponent {
 
   readonly confirmSheetOpen = signal<boolean>(false);
   readonly flagSheetOpen = signal<boolean>(false);
+  readonly deleteOpen = signal<boolean>(false);
+
+  /** true se la segnalazione e' mia (mostra l'azione elimina). */
+  readonly isMine = computed(() => this.data.isMine(this.report().id));
 
   readonly topAvatars: UserKey[] = ['marco', 'sofia', 'luca', 'giulia', 'andrea'];
 
@@ -167,6 +171,16 @@ export class DetailComponent {
     const r = this.report();
     this.data.confirm(r.id, 'risolta');
     this.toast.show(`Voto registrato. ${Math.max(0, RESOLUTION_GOAL - r.resolutionVotes - 1)} ancora per chiuderla.`);
+  }
+
+  askDelete(): void { this.deleteOpen.set(true); }
+  cancelDelete(): void { this.deleteOpen.set(false); }
+  async confirmDelete(): Promise<void> {
+    const id = this.report().id;
+    this.deleteOpen.set(false);
+    const ok = await this.data.deleteReport(id);
+    this.toast.show(ok ? 'Segnalazione eliminata' : 'Eliminazione non riuscita');
+    if (ok) void this.router.navigateByUrl('/home');
   }
 
   openFlag(): void {
