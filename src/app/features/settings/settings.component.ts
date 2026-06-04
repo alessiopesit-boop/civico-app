@@ -44,12 +44,6 @@ export class SettingsComponent {
     void this.router.navigateByUrl('/onboarding');
   }
 
-  logout(): void {
-    void this.auth.logout();
-    this.toast.show('Disconnesso');
-    void this.router.navigateByUrl('/login');
-  }
-
   /** Modale "esci da tutti i dispositivi". */
   readonly confirmAllOpen = signal(false);
   askLogoutAll(): void { this.confirmAllOpen.set(true); }
