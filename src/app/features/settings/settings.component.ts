@@ -54,4 +54,23 @@ export class SettingsComponent {
     this.toast.show('Uscito da tutti i dispositivi');
     void this.router.navigateByUrl('/login');
   }
+
+  /** Modale "elimina account". */
+  readonly deleteOpen = signal(false);
+  readonly deleting = signal(false);
+  askDeleteAccount(): void { this.deleteOpen.set(true); }
+  cancelDeleteAccount(): void { if (!this.deleting()) this.deleteOpen.set(false); }
+  async confirmDeleteAccount(): Promise<void> {
+    if (this.deleting()) return;
+    this.deleting.set(true);
+    const { error } = await this.auth.deleteAccount();
+    this.deleting.set(false);
+    this.deleteOpen.set(false);
+    if (error) {
+      this.toast.show('Eliminazione non riuscita, riprova');
+      return;
+    }
+    this.toast.show('Account eliminato');
+    void this.router.navigateByUrl('/login');
+  }
 }
