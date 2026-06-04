@@ -83,4 +83,14 @@ export class AuthService {
     await this.logout();
     this.onboarded.set(false);
   }
+
+  /** Cancella l'account via Edge Function (delete-account) e fa logout. */
+  async deleteAccount(): Promise<{ error: string | null }> {
+    const client = this.sb.client;
+    if (!client) return { error: 'Backend non configurato.' };
+    const { error } = await client.functions.invoke('delete-account');
+    if (error) return { error: error.message };
+    await this.logout();
+    return { error: null };
+  }
 }

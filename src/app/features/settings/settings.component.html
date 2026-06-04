@@ -141,6 +141,7 @@
 
       <div class="logout-actions">
         <button type="button" class="logout-btn" (click)="askLogoutAll()">Esci da tutti i dispositivi</button>
+        <button type="button" class="logout-btn solid-danger" (click)="askDeleteAccount()">Elimina account</button>
       </div>
     </section>
 
@@ -165,6 +166,24 @@
         <div class="modal-actions">
           <button type="button" class="modal-cancel" (click)="cancelLogoutAll()">Annulla</button>
           <button type="button" class="modal-confirm" (click)="confirmLogoutAll()">Esci ovunque</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (deleteOpen()) {
+    <div class="modal-overlay" (click)="cancelDeleteAccount()">
+      <div class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <button type="button" class="modal-x" (click)="cancelDeleteAccount()" aria-label="Chiudi">
+          <cv-icon name="close" [size]="16" color="var(--cv-text-mute)"/>
+        </button>
+        <div class="modal-title">Eliminare l'account?</div>
+        <div class="modal-sub">Spariranno il tuo profilo e le tue conferme. Le tue segnalazioni restano nella memoria di zona ma diventano anonime. L'azione non si può annullare.</div>
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel" (click)="cancelDeleteAccount()">Annulla</button>
+          <button type="button" class="modal-confirm" (click)="confirmDeleteAccount()" [disabled]="deleting()">
+            {{ deleting() ? 'Elimino...' : 'Elimina account' }}
+          </button>
         </div>
       </div>
     </div>
