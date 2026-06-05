@@ -59,6 +59,12 @@ export const routes: Routes = [
       import('./features/profile/profile.component').then(m => m.ProfileComponent),
   },
   {
+    path: 'u/:id',
+    canActivate: [onboardingGuard],
+    loadComponent: () =>
+      import('./features/public-profile/public-profile.component').then(m => m.PublicProfileComponent),
+  },
+  {
     path: 'settings',
     canActivate: [onboardingGuard],
     loadComponent: () =>
