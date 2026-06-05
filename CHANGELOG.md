@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.3.0](https://github.com/alessiopesit-boop/civico-app/compare/v0.2.0...v0.3.0) (2026-06-05)
+
+
+### Features
+
+* aggancia client Supabase (wiring offline-safe) ([#15](https://github.com/alessiopesit-boop/civico-app/issues/15)) ([dc07cf7](https://github.com/alessiopesit-boop/civico-app/commit/dc07cf74763deeac15f86efe87ba7f7b3320f57f))
+* auth reale via magic-link, account obbligatorio ([#26](https://github.com/alessiopesit-boop/civico-app/issues/26)) ([#17](https://github.com/alessiopesit-boop/civico-app/issues/17)) ([3cd57f6](https://github.com/alessiopesit-boop/civico-app/commit/3cd57f6601290d3158f453ca32013c111bb0e948))
+* elimina account (Edge Function) ([#24](https://github.com/alessiopesit-boop/civico-app/issues/24)) ([d03e01c](https://github.com/alessiopesit-boop/civico-app/commit/d03e01c6cddd6d9cf878559353d57c50646a5608))
+* foto reali delle segnalazioni (Supabase Storage) ([#23](https://github.com/alessiopesit-boop/civico-app/issues/23)) ([92002f8](https://github.com/alessiopesit-boop/civico-app/commit/92002f85ad41b9a4b2617c8a0985b507bc71dbe9))
+* profili pubblici (vista limitata) ([#26](https://github.com/alessiopesit-boop/civico-app/issues/26)) ([d78360b](https://github.com/alessiopesit-boop/civico-app/commit/d78360b0fbeb42f39137896af7f42775576683c3))
+* profili reali (nome, cognome puntato, età 14+) ([#18](https://github.com/alessiopesit-boop/civico-app/issues/18)) ([e0e29e6](https://github.com/alessiopesit-boop/civico-app/commit/e0e29e6ebbd3898c4cfdf338b0b085d09ae933cf))
+* profilo reale + elimina segnalazione ([#22](https://github.com/alessiopesit-boop/civico-app/issues/22)) ([3a0fe38](https://github.com/alessiopesit-boop/civico-app/commit/3a0fe3806c85d0a9d850812e6271420c2af6998a))
+* scadenza reale delle segnalazioni (archiviazione schedulata) ([#25](https://github.com/alessiopesit-boop/civico-app/issues/25)) ([7bee701](https://github.com/alessiopesit-boop/civico-app/commit/7bee701f6f7a0bbdf8f175818b5325fd690b1bba))
+* segnalazioni reali e condivise su Supabase ([#21](https://github.com/alessiopesit-boop/civico-app/issues/21)) ([ca65a47](https://github.com/alessiopesit-boop/civico-app/commit/ca65a47a391abb65ee45ad58cb420e999f9be0f6))
+
+
+### Bug Fixes
+
+* avatar home adattivo + logout compatti rossi ([#19](https://github.com/alessiopesit-boop/civico-app/issues/19)) ([dba25aa](https://github.com/alessiopesit-boop/civico-app/commit/dba25aa020aadc5baed0d6712b2e84b911a6bd32))
+* crash dettaglio su deep-link + conteggio foto onesto ([#27](https://github.com/alessiopesit-boop/civico-app/issues/27)) ([f3d7a9c](https://github.com/alessiopesit-boop/civico-app/commit/f3d7a9caf8c2caa01f65fabbfd6e1feb0f0276a8))
+
 ## [0.2.0](https://github.com/alessiopesit-boop/civico-app/compare/v0.1.0...v0.2.0) (2026-05-30)
 
 
