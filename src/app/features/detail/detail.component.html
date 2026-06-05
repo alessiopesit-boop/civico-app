@@ -89,11 +89,15 @@
         </div>
       }
 
-      <button class="cta-confirm" (click)="openConfirmSheet()">
-        <cv-icon name="hand" [size]="17" color="var(--cv-bg)"/>
-        Anche io l'ho visto
-      </button>
-      <div class="cta-sub">Tocca per scegliere: visto / peggiorato / non c'è più</div>
+      @if (!isMine()) {
+        <button class="cta-confirm" (click)="openConfirmSheet()">
+          <cv-icon name="hand" [size]="17" color="var(--cv-bg)"/>
+          Anche io l'ho visto
+        </button>
+        <div class="cta-sub">Tocca per scegliere: visto / peggiorato / non c'è più</div>
+      } @else {
+        <div class="cta-sub mine">È la tua segnalazione: non puoi confermarla, ma puoi proporla come risolta qui sotto.</div>
+      }
 
       <button class="follow" [class.on]="isFollowing()" (click)="toggleFollow()">
         <div class="f-icon" [class.on]="isFollowing()">

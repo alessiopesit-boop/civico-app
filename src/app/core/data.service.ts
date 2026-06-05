@@ -265,8 +265,10 @@ export class DataService {
       lng: input.lng,
       note: input.note,
       createdAt: new Date().toISOString(),
+      followed: true, // segui di default le tue segnalazioni
     };
     this.reports.update(list => [optimistic, ...list]);
+    this.followedIds.update(l => [...l, optimistic.id]);
 
     const client = this.sb.client;
     const userId = this.auth.user()?.id;
@@ -313,6 +315,8 @@ export class DataService {
             : r,
         ));
         this.myReportIds.update(s => new Set(s).add(realId));
+        // Sposta il follow dall'id ottimistico a quello reale.
+        this.followedIds.update(l => [...l.filter(x => x !== optimistic.id), realId]);
       }
     })();
   }
