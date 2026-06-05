@@ -11,11 +11,11 @@
 
   <div class="title-wrap">
     <h1>Attività</h1>
-    <p>3 nuove · ultimi 7 giorni</p>
+    <p>{{ newCount() }} {{ newCount() === 1 ? 'nuova' : 'nuove' }} · ultimi 7 giorni</p>
   </div>
 
   <div class="tabs">
-    @for (t of tabs; track t.k) {
+    @for (t of tabs(); track t.k) {
       <button class="tab" [class.on]="tab() === t.k" (click)="setTab(t.k)">
         {{ t.label }}
         <span class="count">{{ t.count }}</span>
@@ -34,7 +34,7 @@
     } @else {
       @if (oggi().length) {
         <div class="eyebrow">Oggi</div>
-        @for (row of oggi(); track row.text) {
+        @for (row of oggi(); track row.id) {
           <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
             @if (row.unread) { <span class="unread-dot"></span> }
             <div class="row-icon" [style.background]="row.bg">
@@ -57,7 +57,7 @@
 
       @if (settimana().length) {
         <div class="eyebrow">Questa settimana</div>
-        @for (row of settimana(); track row.text) {
+        @for (row of settimana(); track row.id) {
           <button class="row" [class.unread]="row.unread" (click)="openRow(row)">
             @if (row.unread) { <span class="unread-dot"></span> }
             <div class="row-icon" [style.background]="row.bg">

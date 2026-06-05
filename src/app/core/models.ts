@@ -99,15 +99,23 @@ export type IconName =
 
 export type IconDir = 'left' | 'right' | 'up' | 'down';
 
+export type NotifTab = 'mine' | 'zona';
+
 export interface Notification {
   id: number;
-  reportId?: number;
-  title: string;
-  body: string;
+  iconName: IconName;
+  iconColor: string;
+  bg: string;
+  prefix?: string;
+  text: string;
+  sub: string;
   time: string;
-  unread: boolean;
   group: 'oggi' | 'settimana';
-  action?: { label: string };
+  tab: NotifTab;          // per filtrare le tab (Tutte = tutte)
+  unread: boolean;        // evidenziazione gialla (per-notifica, si spegne all'apertura)
+  acknowledged: boolean;  // badge (si azzera entrando nella schermata)
+  action?: string;        // etichetta CTA opzionale
+  routerLink?: unknown[];
 }
 
 export interface ResolutionVoteKind {

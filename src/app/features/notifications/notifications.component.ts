@@ -1,27 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { DataService } from '../../core/data.service';
 import { ToastService } from '../../core/toast.service';
+import type { Notification, NotifTab } from '../../core/models';
 import { IconBtnComponent } from '../../shared/icon-btn/icon-btn.component';
 import { IconComponent } from '../../shared/icon/icon.component';
 
-type Tab = 'tutte' | 'mine' | 'zona';
-
-interface NotifRow {
-  iconName: string;
-  iconColor: string;
-  bg: string;
-  /** Bold prefix at start of the title (e.g. user name). */
-  prefix?: string;
-  /** Rest of the title. */
-  text: string;
-  sub: string;
-  time: string;
-  unread: boolean;
-  group: 'oggi' | 'settimana';
-  action?: string;
-  routerLink?: unknown[];
-}
+type Tab = 'tutte' | NotifTab;
 
 @Component({
   selector: 'cv-notifications',
@@ -33,79 +19,55 @@ interface NotifRow {
 })
 export class NotificationsComponent {
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly data = inject(DataService);
   private readonly toast = inject(ToastService);
 
   readonly tab = signal<Tab>('tutte');
 
-  readonly tabs: { k: Tab; label: string; count: number }[] = [
-    { k: 'tutte', label: 'Tutte', count: 12 },
-    { k: 'mine',  label: 'Le mie',count:  4 },
-    { k: 'zona',  label: 'Zona',  count:  8 },
-  ];
+  /** Tab con i conteggi veri ricavati dalle notifiche. */
+  readonly tabs = computed<{ k: Tab; label: string; count: number }[]>(() => {
+    const all = this.data.notifications();
+    return [
+      { k: 'tutte', label: 'Tutte',  count: all.length },
+      { k: 'mine',  label: 'Le mie', count: all.filter(n => n.tab === 'mine').length },
+      { k: 'zona',  label: 'Zona',   count: all.filter(n => n.tab === 'zona').length },
+    ];
+  });
 
-  private readonly seed: NotifRow[] = [
-    { iconName: 'hand', iconColor: 'var(--cv-amber)', bg: 'var(--cv-amber-soft)',
-      prefix: 'Sofia R.', text: 'ha confermato la tua buca in Via Garibaldi',
-      sub: 'Ora siete in 47 a confermare.', time: '15 min fa', unread: true, group: 'oggi',
-      routerLink: ['/detail', 1] },
-    { iconName: 'check', iconColor: 'var(--cv-green)', bg: 'var(--cv-green-soft)',
-      text: 'La buca in P.za del Popolo è stata marcata come risolta',
-      sub: '5 vicini hanno confermato la risoluzione. Grazie per averla segnalata.',
-      time: '2 ore fa', unread: true, group: 'oggi', action: 'Vedi dettagli',
-      routerLink: ['/detail', 8] },
-    { iconName: 'sparkle', iconColor: 'var(--cv-amber)', bg: 'var(--cv-amber-soft)',
-      text: 'Nuovo livello sbloccato: Cittadino attivo',
-      sub: 'Hai aperto 6 segnalazioni. Continua così.',
-      time: '3 ore fa', unread: true, group: 'oggi', routerLink: ['/profile'] },
-    { iconName: 'pothole', iconColor: 'var(--cv-amber)', bg: 'var(--cv-amber-soft)',
-      prefix: 'Marco T.', text: 'ha segnalato una nuova buca vicino a te',
-      sub: 'Viale dei Pini · ~120m da casa', time: 'ieri', unread: false,
-      group: 'settimana', action: 'Conferma', routerLink: ['/detail', 4] },
-    { iconName: 'car', iconColor: 'var(--cv-red)', bg: 'var(--cv-red-soft)',
-      text: '3 nuove segnalazioni di sicurezza in zona',
-      sub: 'P.za Mazzini, Via San Marco. Anonime per privacy.',
-      time: '2 giorni fa', unread: false, group: 'settimana', routerLink: ['/map'] },
-    { iconName: 'hand', iconColor: 'var(--cv-green)', bg: 'var(--cv-green-soft)',
-      text: 'Hai confermato 3 segnalazioni questa settimana',
-      sub: 'La tua zona è più informata grazie a te.',
-      time: '3 giorni fa', unread: false, group: 'settimana' },
-    { iconName: 'check', iconColor: 'var(--cv-green)', bg: 'var(--cv-green-soft)',
-      prefix: 'Lampione in Via Roma', text: 'è ora risolto',
-      sub: '89 conferme, 5 conferme di risoluzione.',
-      time: '4 giorni fa', unread: false, group: 'settimana',
-      routerLink: ['/detail', 3] },
-  ];
+  /** Notifiche filtrate per tab attiva. */
+  private readonly filtered = computed<Notification[]>(() => {
+    const t = this.tab();
+    const all = this.data.notifications();
+    return t === 'tutte' ? all : all.filter(n => n.tab === t);
+  });
 
-  /** Lista corrente (svuotabile da "Elimina tutte"). */
-  readonly rows = signal<NotifRow[]>([...this.seed]);
-  readonly oggi = computed(() => this.rows().filter(r => r.group === 'oggi'));
-  readonly settimana = computed(() => this.rows().filter(r => r.group === 'settimana'));
-  readonly isEmpty = computed(() => this.rows().length === 0);
+  readonly oggi = computed(() => this.filtered().filter(n => n.group === 'oggi'));
+  readonly settimana = computed(() => this.filtered().filter(n => n.group === 'settimana'));
+  readonly isEmpty = computed(() => this.data.notifications().length === 0);
+  readonly newCount = computed(() => this.data.notifications().filter(n => n.unread).length);
 
-  /** Modale di conferma per l'eliminazione di tutte le notifiche. */
   readonly confirmOpen = signal<boolean>(false);
+
+  constructor() {
+    // Entrando, le notifiche sono "viste": il badge si azzera (le gialle restano).
+    this.data.markNotificationsSeen();
+  }
 
   setTab(k: Tab): void { this.tab.set(k); }
 
-  back(): void { window.history.back(); }
-
+  back(): void { this.location.back(); }
   goSettings(): void { void this.router.navigate(['/settings']); }
 
-  openRow(row: NotifRow): void {
+  openRow(row: Notification): void {
+    this.data.markNotificationRead(row.id);
     if (row.routerLink) void this.router.navigate(row.routerLink as readonly unknown[]);
   }
 
-  askClear(): void {
-    this.confirmOpen.set(true);
-  }
-
-  cancelClear(): void {
-    this.confirmOpen.set(false);
-  }
-
+  askClear(): void { this.confirmOpen.set(true); }
+  cancelClear(): void { this.confirmOpen.set(false); }
   confirmClear(): void {
-    this.rows.set([]);
+    this.data.clearNotifications();
     this.confirmOpen.set(false);
     this.toast.show('Notifiche eliminate');
   }
