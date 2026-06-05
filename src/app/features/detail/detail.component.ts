@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CATS, RESOLUTION_GOAL, USERS } from '../../core/data';
@@ -47,11 +47,30 @@ export class DetailComponent {
   readonly RESOLUTION_GOAL = RESOLUTION_GOAL;
   protected readonly Math = Math;
 
+  /** Segnalazione placeholder valida, usata mentre l'elenco si carica (evita
+   *  crash dei computed derivati su deep-link/refresh con elenco ancora vuoto). */
+  private static readonly PLACEHOLDER: Report = {
+    id: 0, cat: 'buca', title: '', where: '', time: 'ora',
+    confirms: 0, recent6h: 0, resolutionVotes: 0, photo: 'asphalt', by: 'anon',
+  };
+
   readonly report = computed<Report>(() => {
     const idNum = parseInt(this.id(), 10);
     const list = this.data.reports();
-    return list.find(r => r.id === idNum) ?? list[0];
+    return list.find(r => r.id === idNum) ?? DetailComponent.PLACEHOLDER;
   });
+
+  constructor() {
+    // Se l'elenco e' caricato ma l'id non esiste (link vecchio, segnalazione
+    // archiviata/eliminata), torna in home invece di mostrare il placeholder.
+    effect(() => {
+      const idNum = parseInt(this.id(), 10);
+      const list = this.data.reports();
+      if (list.length > 0 && !list.some(r => r.id === idNum)) {
+        void this.router.navigateByUrl('/home');
+      }
+    });
+  }
 
   // Mini-mappa: il pin corrispondente (per coordinate) o un fallback su Roma.
   readonly mapPin = computed<Pin>(() => {
@@ -114,7 +133,7 @@ export class DetailComponent {
     return [
       { label: 'Segnalata',     sub: `${u.name} ha aperto la segnalazione`, time: r.time,         done: true,                         current: false,                 last: false },
       { label: 'Confermata',    sub: `${r.confirms} vicini hanno confermato`, time: 'ora',         done: isResolved,                   current: !isResolved,           last: false },
-      { label: 'In lavorazione', sub: 'Servono 3 conferme di risoluzione',  time: '—',             done: isResolved,                   current: false,                 last: false },
+      { label: 'In lavorazione', sub: `Servono ${RESOLUTION_GOAL} conferme di risoluzione`, time: '—', done: isResolved,           current: false,                 last: false },
       { label: 'Risolta',       sub: 'Quando 5+ vicini confermano',         time: isResolved ? 'ora' : '—', done: isResolved,            current: false,                 last: true  },
     ];
   });
