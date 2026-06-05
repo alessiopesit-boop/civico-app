@@ -1,0 +1,34 @@
+<!--
+  Civico - template email "Magic Link" (e "Confirm signup").
+  Subject suggerito: Il tuo accesso a Civico
+  NB: incollabile in Supabase > Authentication > Email Templates SOLO dopo aver
+  configurato un SMTP custom (il servizio email di default non consente di
+  modificare i template). Lasciare {{ .ConfirmationURL }} invariato.
+-->
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0F1115;padding:32px 0;font-family:'Manrope',Arial,sans-serif;">
+  <tr><td align="center">
+    <table width="100%" style="max-width:480px;background:#171A1F;border:1px solid #262A31;border-radius:18px;padding:32px;">
+      <tr><td>
+        <div style="font-size:22px;font-weight:800;color:#FFFFFF;letter-spacing:-0.5px;">
+          Civico <span style="color:#F5A524;">•</span>
+        </div>
+        <h1 style="font-size:22px;font-weight:800;color:#FFFFFF;margin:24px 0 8px;letter-spacing:-0.4px;">
+          Accedi a Civico
+        </h1>
+        <p style="font-size:14px;line-height:1.6;color:#A8AEB8;margin:0 0 24px;">
+          Tocca il pulsante per entrare. Il link è valido per poco tempo e si può usare una sola volta.
+        </p>
+        <a href="{{ .ConfirmationURL }}"
+           style="display:inline-block;background:#F5A524;color:#0F1115;text-decoration:none;font-weight:800;font-size:15px;padding:14px 28px;border-radius:12px;">
+          Entra in Civico
+        </a>
+        <p style="font-size:12px;line-height:1.6;color:#6B717C;margin:24px 0 0;">
+          Se non hai richiesto questo accesso, ignora pure questa email.
+        </p>
+      </td></tr>
+    </table>
+    <p style="font-size:11px;color:#6B717C;margin:18px 0 0;font-family:'Manrope',Arial,sans-serif;">
+      Civico · dalla gente, per la gente
+    </p>
+  </td></tr>
+</table>
