@@ -61,10 +61,12 @@ export class DataService {
   /** Conferme date da me (numero di righe in confirmations a mio nome). */
   readonly myConfirmCount = signal<number>(0);
 
-  // Notifiche (ancora seed locale per ora).
+  // Notifiche (ancora seed locale per ora). Due stati:
+  //  - unread: evidenziazione gialla, si spegne aprendo la notifica.
+  //  - acknowledged: badge, si azzera entrando nella schermata notifiche.
   readonly notifications = signal<Notification[]>([...SEED_NOTIFICATIONS]);
   readonly unreadNotificationsCount = computed(
-    () => this.notifications().filter(n => n.unread).length,
+    () => this.notifications().filter(n => n.unread && !n.acknowledged).length,
   );
 
   // ── Filters & sort (home screen) ───────────────────────────────────────
@@ -265,8 +267,10 @@ export class DataService {
       lng: input.lng,
       note: input.note,
       createdAt: new Date().toISOString(),
+      followed: true, // segui di default le tue segnalazioni
     };
     this.reports.update(list => [optimistic, ...list]);
+    this.followedIds.update(l => [...l, optimistic.id]);
 
     const client = this.sb.client;
     const userId = this.auth.user()?.id;
@@ -313,6 +317,8 @@ export class DataService {
             : r,
         ));
         this.myReportIds.update(s => new Set(s).add(realId));
+        // Sposta il follow dall'id ottimistico a quello reale.
+        this.followedIds.update(l => [...l.filter(x => x !== optimistic.id), realId]);
       }
     })();
   }
@@ -341,8 +347,20 @@ export class DataService {
     return ((data ?? []) as ReportRow[]).map(row => this.mapRow(row, followed, flagged));
   }
 
-  markAllNotificationsRead(): void {
-    this.notifications.update(list => list.map(n => ({ ...n, unread: false })));
+  /** Entrando nella schermata: azzera il badge (ma le gialle restano gialle). */
+  markNotificationsSeen(): void {
+    this.notifications.update(list => list.map(n => ({ ...n, acknowledged: true })));
+  }
+
+  /** Aprendo una notifica: non e' piu' gialla. */
+  markNotificationRead(id: number): void {
+    this.notifications.update(list => list.map(n =>
+      n.id === id ? { ...n, unread: false, acknowledged: true } : n,
+    ));
+  }
+
+  clearNotifications(): void {
+    this.notifications.set([]);
   }
 
   // ── Zones mutations ────────────────────────────────────────────────────

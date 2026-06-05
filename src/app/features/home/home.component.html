@@ -38,23 +38,14 @@
 
   </div>
 
-  <!-- Map controls + FAB -->
-  <div class="map-controls"
-       [style.bottom.px]="sheetH() + 12"
-       [class.dragging]="isDragging()"
-       [class.hidden]="!showControls()">
-    <cv-icon-btn>
-      <cv-icon name="locate" [size]="16" color="var(--cv-text)"/>
-    </cv-icon-btn>
-  </div>
-
+  <!-- FAB nuova segnalazione (angolo in basso a destra) -->
   <button class="fab"
-          [style.bottom.px]="sheetH() + (showControls() ? 92 : 12)"
+          [style.bottom.px]="sheetH() + 12"
           [class.dragging]="isDragging()"
           [class.hidden]="!showFab()"
           (click)="tapFab()"
           aria-label="Nuova segnalazione">
-    <cv-icon name="plus" [size]="26" color="var(--cv-bg)"/>
+    <cv-icon name="plus" [size]="20" color="var(--cv-bg)"/>
   </button>
 
   <!-- Bottom sheet -->

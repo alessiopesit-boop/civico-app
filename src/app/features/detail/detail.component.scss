@@ -101,8 +101,19 @@
   align-items: center;
   gap: 10px;
   margin-top: 12px;
-  &.tappable { cursor: pointer; }
-  &.tappable .name { text-decoration: underline; text-underline-offset: 2px; }
+  .author-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-family: var(--cv-font);
+    .name { text-decoration: underline; text-underline-offset: 2px; }
+    &:active { opacity: 0.6; }
+  }
   .name { color: var(--cv-text); font-weight: 600; font-size: 13px; }
   .dot { width: 3px; height: 3px; border-radius: 2px; background: var(--cv-text-faint); }
   .ago {
@@ -380,6 +391,7 @@
 
 .mini-map {
   position: relative;
+  z-index: 0; // confina gli z-index interni di Leaflet sotto sheet/overlay
   height: 138px;
   border-radius: 14px;
   overflow: hidden;
