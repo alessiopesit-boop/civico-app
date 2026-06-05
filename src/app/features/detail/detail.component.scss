@@ -391,6 +391,7 @@
 
 .mini-map {
   position: relative;
+  z-index: 0; // confina gli z-index interni di Leaflet sotto sheet/overlay
   height: 138px;
   border-radius: 14px;
   overflow: hidden;
