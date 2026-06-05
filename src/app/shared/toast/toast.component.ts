@@ -19,9 +19,9 @@ import { IconComponent } from '../icon/icon.component';
   `,
   styles: [`
     .toast {
-      position: absolute;
+      position: fixed;
       left: 14px; right: 14px; bottom: 80px;
-      z-index: 200;
+      z-index: 100000;
       padding: 12px 14px;
       border-radius: 14px;
       background: rgba(15, 17, 21, 0.94);

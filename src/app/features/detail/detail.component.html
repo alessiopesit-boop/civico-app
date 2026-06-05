@@ -37,11 +37,16 @@
     <div class="body">
       <h1 class="title">{{ report().title }}</h1>
 
-      <div class="author" [class.tappable]="!!report().authorId" (click)="goAuthor()">
-        <cv-avatar [userObj]="author()" [size]="26"/>
-        <span class="name">{{ author().name }}</span>
+      <div class="author">
         @if (report().authorId) {
-          <cv-icon name="chevron" [size]="12" color="var(--cv-text-faint)"/>
+          <button type="button" class="author-link" (click)="goAuthor()">
+            <cv-avatar [userObj]="author()" [size]="26"/>
+            <span class="name">{{ author().name }}</span>
+            <cv-icon name="chevron" [size]="12" color="var(--cv-text-faint)"/>
+          </button>
+        } @else {
+          <cv-avatar [userObj]="author()" [size]="26"/>
+          <span class="name">{{ author().name }}</span>
         }
         <span class="dot"></span>
         <span class="ago">
@@ -94,9 +99,6 @@
           <cv-icon name="hand" [size]="17" color="var(--cv-bg)"/>
           Anche io l'ho visto
         </button>
-        <div class="cta-sub">Tocca per scegliere: visto / peggiorato / non c'è più</div>
-      } @else {
-        <div class="cta-sub mine">È la tua segnalazione: non puoi confermarla, ma puoi proporla come risolta qui sotto.</div>
       }
 
       <button class="follow" [class.on]="isFollowing()" (click)="toggleFollow()">
